@@ -1,0 +1,642 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Ù…ØªØ§Ù‡Ø© Ø§Ù„Ø¸Ù„Ø§Ù… - Ù„Ø¹Ø¨Ø© Ù…ØºØ§Ù…Ø±Ø© ÙˆØ§Ø³ØªÙƒØ´Ø§Ù Ø§Ù„Ù…ØªØ§Ù‡Ø© Ø«Ù„Ø§Ø«ÙŠØ© Ø§Ù„Ø£Ø¨Ø¹Ø§Ø¯" />
+  <title>Ù…ØªØ§Ù‡Ø© Ø§Ù„Ø¸Ù„Ø§Ù… â€” Maze of Darkness 3D</title>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Import Map â€” Three.js ESM -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":                        "./libs/three.min.js",
+      "three/addons/":                "./libs/addons/"
+    }
+  }
+  </script>
+
+  <!-- Game CSS -->
+  <link rel="stylesheet" href="ui/styles/main.css" />
+</head>
+<body>
+
+  <!-- ===== PROFILE SETUP SCREEN ===== -->
+  <div id="screen-profile" class="screen">
+    <div class="menu-bg"></div>
+    <div class="section-panel">
+      <h2>Ø¥Ù†Ø´Ø§Ø¡ Ù…Ù„Ù ØªØ¹Ø±ÙŠÙ</h2>
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="profile-form">
+        <div class="input-group">
+          <label for="profile-name">Ø§Ø³Ù… Ø§Ù„Ù„Ø§Ø¹Ø¨</label>
+          <input type="text" id="profile-name" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ø³Ù…Ùƒ Ù‡Ù†Ø§..." maxlength="15" autocomplete="off">
+          <span id="name-error" class="error-msg">Ø§Ù„Ø§Ø³Ù… ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ø­Ø±ÙˆÙ ÙÙ‚Ø· (3-15 Ø­Ø±Ù)</span>
+        </div>
+
+        <div class="gender-selection">
+          <label>Ø´Ø®ØµÙŠØ© Ø§Ù„Ù„Ø§Ø¹Ø¨</label>
+          <div class="gender-cards">
+            <div class="gender-card active" id="card-hero" onclick="ProfileUI.selectGender('hero')">
+              <div class="gender-preview hero-bg" id="preview-hero">
+                <!-- 3D Canvas will be injected here -->
+              </div>
+              <span class="gender-name">Ø§Ù„Ù…ØºØ§Ù…Ø±Ø© (Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©)</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-save-profile" class="btn-main btn-glow" onclick="ProfileUI.save()">
+          <span>Ø¨Ø¯Ø¡ Ø§Ù„Ù…ØºØ§Ù…Ø±Ø© â–¶</span>
+        </button>
+      </div>
+
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="settings-status" id="settings-status-msg"></div>
+
+      <div class="settings-actions">
+        <button class="btn-save-settings" onclick="Settings.confirmSave()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª</span>
+        </button>
+        <button class="btn-reset-settings" onclick="Settings.resetToDefaults()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN MENU SCREEN ===== -->
+  <div id="screen-menu" class="screen">
+    <audio id="menu-audio" src="assets/sounds/menu_theme.mp3" loop preload="auto"></audio>
+    <div class="menu-bg"></div>
+    <div class="menu-content menu-content-main">
+      <div class="menu-buttons">
+        <button id="btn-play" class="btn-banner-wrap btn-play-wrap" title="Ø¨Ø¯Ø¡ Ø§Ù„Ù„Ø¹Ø¨">
+          <img src="assets/ui/icons/btn_play.png" alt="Ø¨Ø¯Ø¡ Ø§Ù„Ù„Ø¹Ø¨" class="btn-banner-img" />
+        </button>
+        <button id="btn-levels" class="btn-banner-wrap" title="Ø§Ù„Ù…Ø±Ø§Ø­Ù„">
+          <img src="assets/ui/icons/btn_stages.png" alt="Ø§Ù„Ù…Ø±Ø§Ø­Ù„" class="btn-banner-img" />
+        </button>
+        <button id="btn-account" class="btn-banner-wrap" title="Ø§Ù„Ø­Ø³Ø§Ø¨">
+          <img src="assets/ui/icons/btn_account.png" alt="Ø§Ù„Ø­Ø³Ø§Ø¨" class="btn-banner-img" />
+        </button>
+        <button id="btn-settings" class="btn-banner-wrap" title="Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª">
+          <img src="assets/ui/icons/btn_settings.png" alt="Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª" class="btn-banner-img" />
+        </button>
+        <button id="btn-about" class="btn-banner-wrap" title="Ø­ÙˆÙ„ Ø§Ù„Ù„Ø¹Ø¨Ø©">
+          <img src="assets/ui/icons/btn_about.png" alt="Ø­ÙˆÙ„ Ø§Ù„Ù„Ø¹Ø¨Ø©" class="btn-banner-img" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LEVEL SELECT SCREEN ===== -->
+  <div id="screen-levels" class="screen">
+    <div class="menu-bg"></div>
+    <div class="section-panel">
+      <button class="btn-back" onclick="UI.showScreen('menu')" title="Ø±Ø¬ÙˆØ¹">
+        <img src="assets/ui/icons/btn_close.png" alt="Ø±Ø¬ÙˆØ¹" class="icon-close-img" />
+      </button>
+      <h2>Ø§Ø®ØªØ± Ø§Ù„Ù…Ø±Ø­Ù„Ø©</h2>
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div id="levels-grid" class="levels-grid">
+        <!-- Levels injected by JS -->
+      </div>
+
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="settings-status" id="settings-status-msg"></div>
+
+      <div class="settings-actions">
+        <button class="btn-save-settings" onclick="Settings.confirmSave()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª</span>
+        </button>
+        <button class="btn-reset-settings" onclick="Settings.resetToDefaults()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS SCREEN ===== -->
+  <div id="screen-settings" class="screen">
+    <div class="menu-bg"></div>
+    <div class="section-panel">
+      <button class="btn-back" onclick="UI.goBack()" title="Ø±Ø¬ÙˆØ¹">
+        <img src="assets/ui/icons/btn_close.png" alt="Ø±Ø¬ÙˆØ¹" class="icon-close-img" />
+      </button>
+      <h2>Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª</h2>
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="settings-tabs">
+        <button class="settings-tab-btn active" onclick="Settings.showTab('gameplay')">Ø§Ù„Ù„Ø¹Ø¨</button>
+        <button class="settings-tab-btn" onclick="Settings.showTab('audio')">Ø§Ù„ØµÙˆØª</button>
+        <button class="settings-tab-btn" onclick="Settings.showTab('controls')">Ø§Ù„ØªØ­ÙƒÙ…</button>
+        <button class="settings-tab-btn" onclick="Settings.showTab('graphics')">Ø§Ù„Ø¬Ø±Ø§ÙÙŠÙƒ</button>
+      </div>
+
+      <div class="settings-list" id="settings-gameplay">
+        <div class="setting-item">
+          <label>Ø§Ù„Ù„ØºØ©</label>
+          <div class="toggle-group">
+            <button id="lang-ar" class="toggle-btn active" onclick="Settings.setLanguage('ar')">Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©</button>
+            <button id="lang-en" class="toggle-btn" onclick="Settings.setLanguage('en')" title="Ù‚Ø±ÙŠØ¨Ø§Ù‹ / Soon">English (Ù‚Ø±ÙŠØ¨Ø§Ù‹)</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>ÙˆØ¶Ø¹ Ø§Ù„ÙƒØ§Ù…ÙŠØ±Ø§</label>
+          <div class="toggle-group">
+            <button id="cam-first" class="toggle-btn active" onclick="Settings.setCameraMode('first')">Ù…Ù†Ø¸ÙˆØ± Ø£ÙˆÙ„</button>
+            <button id="cam-third" class="toggle-btn" onclick="Settings.setCameraMode('third')">Ù…Ù†Ø¸ÙˆØ± Ø«Ø§Ù„Ø«</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-list hidden" id="settings-audio">
+        <div class="setting-item">
+          <label>ØµÙˆØª Ø§Ù„ÙˆØ§Ø¬Ù‡Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</label>
+          <input type="range" id="setting-vol-menu" min="0" max="1" step="0.05" value="0.5" class="setting-range" oninput="Settings.setVolMenu(this.value)">
+          <div class="range-val" id="val-vol-menu">50%</div>
+        </div>
+        <div class="setting-item">
+          <label>ØµÙˆØª Ù…ÙˆØ³ÙŠÙ‚Ù‰ Ø§Ù„Ù„Ø¹Ø¨</label>
+          <input type="range" id="setting-vol-game" min="0" max="1" step="0.05" value="0.4" class="setting-range" oninput="Settings.setVolGame(this.value)">
+          <div class="range-val" id="val-vol-game">40%</div>
+        </div>
+        <div class="setting-item">
+          <label>ØµÙˆØª Ø§Ù„Ù…Ø·Ø±</label>
+          <input type="range" id="setting-vol-rain" min="0" max="1" step="0.05" value="0.5" class="setting-range" oninput="Settings.setVolRain(this.value)">
+          <div class="range-val" id="val-vol-rain">50%</div>
+        </div>
+        <div class="setting-item">
+          <label>ØµÙˆØª Ø§Ù„Ø¨Ø±Ù‚</label>
+          <input type="range" id="setting-vol-thunder" min="0" max="1" step="0.05" value="0.8" class="setting-range" oninput="Settings.setVolThunder(this.value)">
+          <div class="range-val" id="val-vol-thunder">80%</div>
+        </div>
+        <div class="setting-item">
+          <label>Ø§Ù„Ù…Ø¤Ø«Ø±Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø© (SFX)</label>
+          <div class="toggle-group">
+            <button id="sfx-on" class="toggle-btn active" onclick="Settings.toggleSFX(true)">ØªØ´ØºÙŠÙ„</button>
+            <button id="sfx-off" class="toggle-btn" onclick="Settings.toggleSFX(false)">Ø¥ÙŠÙ‚Ø§Ù</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-list hidden" id="settings-controls">
+        <div class="setting-item">
+          <label>Ø­Ø³Ø§Ø³ÙŠØ© Ø§Ù„Ù„Ù…Ø³</label>
+          <input type="range" id="setting-sens" min="0.5" max="2.0" step="0.1" value="1.0" class="setting-range" oninput="Settings.setSensitivity(this.value)">
+          <div class="range-val" id="range-sens-val">1.0x</div>
+        </div>
+        <div class="setting-item">
+          <label>Ø§Ù„Ø§Ù‡ØªØ²Ø§Ø² (Haptic)</label>
+          <div class="toggle-group">
+            <button id="haptic-on" class="toggle-btn active" onclick="Settings.setHaptic(true)">ØªØ´ØºÙŠÙ„</button>
+            <button id="haptic-off" class="toggle-btn" onclick="Settings.setHaptic(false)">Ø¥ÙŠÙ‚Ø§Ù</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-list hidden" id="settings-graphics">
+        <div class="setting-item">
+          <label>Ø¬ÙˆØ¯Ø© Ø§Ù„Ø±Ø³ÙˆÙ…</label>
+          <div class="toggle-group">
+            <button id="q-low" class="toggle-btn" onclick="Settings.setQuality('low')">Ù…Ù†Ø®ÙØ¶Ø©</button>
+            <button id="q-med" class="toggle-btn active" onclick="Settings.setQuality('medium')">Ù…ØªÙˆØ³Ø·Ø©</button>
+            <button id="q-high" class="toggle-btn" onclick="Settings.setQuality('high')">Ø¹Ø§Ù„ÙŠØ©</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>ØªÙ†Ø¹ÙŠÙ… Ø§Ù„Ø­ÙˆØ§Ù (Antialiasing)</label>
+          <div class="toggle-group">
+            <button id="aa-on" class="toggle-btn active" onclick="Settings.toggleAA(true)">ØªØ´ØºÙŠÙ„</button>
+            <button id="aa-off" class="toggle-btn" onclick="Settings.toggleAA(false)">Ø¥ÙŠÙ‚Ø§Ù</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>Ø§Ù„Ø¸Ù„Ø§Ù„ (Shadows)</label>
+          <div class="toggle-group">
+            <button id="shadows-on" class="toggle-btn active" onclick="Settings.toggleShadows(true)">ØªØ´ØºÙŠÙ„</button>
+            <button id="shadows-off" class="toggle-btn" onclick="Settings.toggleShadows(false)">Ø¥ÙŠÙ‚Ø§Ù</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="settings-status" id="settings-status-msg"></div>
+
+      <div class="settings-actions">
+        <button class="btn-save-settings" onclick="Settings.confirmSave()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª</span>
+        </button>
+        <button class="btn-reset-settings" onclick="Settings.resetToDefaults()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ACCOUNT SCREEN ===== -->
+  <div id="screen-account" class="screen">
+    <div class="menu-bg"></div>
+    <div class="section-panel">
+      <button class="btn-back" onclick="UI.showScreen('menu')" title="Ø±Ø¬ÙˆØ¹">
+        <img src="assets/ui/icons/btn_close.png" alt="Ø±Ø¬ÙˆØ¹" class="icon-close-img" />
+      </button>
+      <h2>Ù…Ù„Ù Ø§Ù„Ø­Ø³Ø§Ø¨</h2>
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="account-content">
+        <!-- 1. Character Section -->
+        <div class="account-profile-header">
+          <div class="account-avatar-wrap">
+            <div class="account-avatar" id="acc-preview-box"></div>
+          </div>
+          <div class="char-type-badge" id="acc-gender-label">Ø§Ù„Ø±Ø­Ø§Ù„</div>
+          <button class="btn-main btn-secondary btn-small" onclick="UI.showScreen('char-select')">
+            <span>ØªØºÙŠÙŠØ± Ø§Ù„Ø´Ø®ØµÙŠØ©</span>
+          </button>
+        </div>
+
+        <!-- 2. Identity Section -->
+        <div class="account-card-name">
+          <div class="input-minimal">
+            <label>Ø§Ø³Ù… Ø§Ù„Ù„Ø§Ø¹Ø¨</label>
+            <input type="text" id="acc-name-input" maxlength="15" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ø³Ù…Ùƒ...">
+          </div>
+        </div>
+
+        <!-- 3. Statistics Section -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-label">Ø§Ù„Ù…Ø±Ø§Ø­Ù„</span>
+            <span class="stat-value" id="acc-levels">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Ø§Ù„ÙˆÙ‚Øª</span>
+            <span class="stat-value" id="acc-time">0Ø¯</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Ø¹Ù…Ø± Ø§Ù„Ø­Ø³Ø§Ø¨</span>
+            <span class="stat-value" id="acc-age">0 ÙŠÙˆÙ…</span>
+          </div>
+        </div>
+
+        <!-- 4. Action Buttons (Compact & Side-by-side) -->
+        <div class="account-actions-row">
+          <button class="btn-action-save" onclick="ProfileUI.saveAccountChanges()">Ø­ÙØ¸</button>
+          <button class="btn-action-reset" onclick="ProfileUI.resetAccount()">Ø­Ø°Ù</button>
+        </div>
+      </div>
+
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="settings-status" id="settings-status-msg"></div>
+
+      <div class="settings-actions">
+        <button class="btn-save-settings" onclick="Settings.confirmSave()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª</span>
+        </button>
+        <button class="btn-reset-settings" onclick="Settings.resetToDefaults()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARACTER SELECTION SCREEN ===== -->
+  <div id="screen-char-select" class="screen">
+    <div class="menu-bg"></div>
+    <div class="section-panel">
+      <button class="btn-back" onclick="UI.showScreen('account')" title="Ø±Ø¬ÙˆØ¹">
+        <img src="assets/ui/icons/btn_close.png" alt="Ø±Ø¬ÙˆØ¹" class="icon-close-img" />
+      </button>
+      <h2>Ø§Ø®ØªØ± Ø§Ù„Ø´Ø®ØµÙŠØ©</h2>
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="char-select-content">
+        <div id="char-list" class="char-list">
+          <!-- Injected by ProfileUI.js -->
+        </div>
+      </div>
+
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="settings-status" id="settings-status-msg"></div>
+
+      <div class="settings-actions">
+        <button class="btn-save-settings" onclick="Settings.confirmSave()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª</span>
+        </button>
+        <button class="btn-reset-settings" onclick="Settings.resetToDefaults()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ABOUT SCREEN ===== -->
+  <div id="screen-about" class="screen">
+    <div class="menu-bg"></div>
+    <div class="section-panel">
+      <button class="btn-back" onclick="UI.showScreen('menu')" title="Ø±Ø¬ÙˆØ¹">
+        <img src="assets/ui/icons/btn_close.png" alt="Ø±Ø¬ÙˆØ¹" class="icon-close-img" />
+      </button>
+      <h2>Ø­ÙˆÙ„ Ø§Ù„Ù„Ø¹Ø¨Ø©</h2>
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="about-content">
+        <div class="about-card">
+          <div class="logo-icon">ðŸŒ€</div>
+          <h3>MAZE 3D</h3>
+          <p class="version">Ø§Ù„Ø¥ØµØ¯Ø§Ø± 1.0.0</p>
+
+          <div class="about-text">
+            <p>Ù„Ø¹Ø¨Ø© Ù…ØªØ§Ù‡Ø© Ø«Ù„Ø§Ø«ÙŠØ© Ø§Ù„Ø£Ø¨Ø¹Ø§Ø¯ Ù…Ø«ÙŠØ±Ø©ØŒ Ø§Ø³ØªÙƒØ´Ù Ø§Ù„Ù…Ù…Ø±Ø§Øª Ø§Ù„ØºØ§Ù…Ø¶Ø©ØŒ Ø§Ø¬Ù…Ø¹ Ø§Ù„Ù…ÙØ§ØªÙŠØ­ØŒ ÙˆØ§Ø¨Ø­Ø« Ø¹Ù† Ù…Ø®Ø±Ø¬ Ø§Ù„Ù†ÙˆØ± Ø§Ù„Ø³Ø­Ø±ÙŠ.</p>
+            <hr>
+            <p>ØªÙ… Ø§Ù„ØªØ·ÙˆÙŠØ± Ø¨ÙˆØ§Ø³Ø·Ø©</p>
+            <p class="developer">Ø§Ù„Ù…Ø·ÙˆØ± Ø§Ù„Ù…Ø­ØªØ±Ù</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="settings-status" id="settings-status-msg"></div>
+
+      <div class="settings-actions">
+        <button class="btn-save-settings" onclick="Settings.confirmSave()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª</span>
+        </button>
+        <button class="btn-reset-settings" onclick="Settings.resetToDefaults()">
+          <svg class="action-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCREEN ===== -->
+  <div id="screen-game" class="screen">
+
+    <!-- Three.js Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD Overlay -->
+    <div id="hud" class="hud">
+
+      <!-- Top Bar -->
+      <div class="hud-top">
+        <!-- Start / Left Section: Level, Weather & Time, Cam Toggle -->
+        <div class="hud-top-section hud-top-start">
+          <div class="hud-stat hud-level-widget" id="hud-level">Ù…Ø±Ø­Ù„Ø© <span id="hud-level-num">1</span></div>
+          <!-- Celestial Orbit & Weather Badge -->
+          <div class="hud-celestial-badge" id="hud-celestial-badge">
+            <div class="celestial-orbit-wrap">
+              <div class="celestial-orbit-ring" id="celestial-orbit-ring">
+                <span class="celestial-body-icon" id="celestial-body-icon">â˜€ï¸</span>
+              </div>
+            </div>
+            <div class="celestial-info">
+              <span class="celestial-time" id="celestial-time-text">08:00 Øµ</span>
+              <span class="celestial-weather" id="celestial-weather-badge">
+                <span id="celestial-weather-icon">â˜€ï¸</span>
+                <span id="celestial-weather-name">Ù†Ù‡Ø§Ø± Ù…Ø´Ø±Ù‚</span>
+              </span>
+            </div>
+          </div>
+          <button id="btn-cam-toggle" class="hud-cam-btn" title="ØªØ¨Ø¯ÙŠÙ„ Ø§Ù„ÙƒØ§Ù…ÙŠØ±Ø§">
+            <img src="assets/ui/icons/cam_first.png" alt="ØªØ¨Ø¯ÙŠÙ„ Ø§Ù„ÙƒØ§Ù…ÙŠØ±Ø§" class="hud-btn-img" />
+          </button>
+        </div>
+
+        <!-- Center Section: Timer only -->
+        <div class="hud-top-section hud-top-center">
+          <div class="hud-stat" id="hud-timer">
+            <img src="assets/ui/icons/hud_timer.png" alt="ÙˆÙ‚Øª" class="hud-stat-icon" />
+            <span id="hud-time">00:00</span>
+          </div>
+        </div>
+
+        <!-- End / Actions Section: Keys Counter + Mission Button + Settings Button -->
+        <div class="hud-top-section hud-top-end">
+          <!-- Keys counter next to mission -->
+          <div class="hud-stat hud-key-widget" id="hud-coins">
+            <img src="assets/ui/icons/hud_key.png" alt="Ù…ÙØªØ§Ø­" class="hud-key-icon-top" />
+            <span id="hud-keys">0/0</span>
+          </div>
+          <div class="mission-btn-wrap">
+            <button id="btn-mission" class="hud-mission-btn" title="Ø§Ù„Ù…Ù‡Ù…Ø©">
+              <span id="mission-alert" class="mission-alert hidden"></span>
+              <img src="assets/ui/icons/btn_task.png" alt="Ø§Ù„Ù…Ù‡Ù…Ø©" class="hud-btn-img" />
+            </button>
+            <div id="mission-toast" class="mission-toast hidden">ØªÙ… Ø¥ÙƒÙ…Ø§Ù„ Ø§Ù„Ù…Ù‡Ù…Ø©!</div>
+          </div>
+          <button id="btn-pause" class="hud-menu-btn hud-settings-btn" title="Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª / Ø¥ÙŠÙ‚Ø§Ù">
+            <img src="assets/ui/icons/hud_settings.png" alt="Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª" class="hud-btn-img" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Vitals Overlay (Health & Stamina Bars) -->
+      <div class="hud-vitals" id="hud-vitals">
+        <div class="vital-row health-row">
+          <span class="vital-icon">â¤ï¸</span>
+          <div class="vital-bar-bg">
+            <div class="vital-bar-fill health-bar-fill" id="health-bar-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="vital-row stamina-row">
+          <span class="vital-icon">âš¡</span>
+          <div class="vital-bar-bg">
+            <div class="vital-bar-fill stamina-bar-fill" id="stamina-bar-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Controls -->
+      <div id="mobile-controls" class="mobile-controls">
+        <!-- Joystick Movement (Left Thumb) -->
+        <div class="joystick-zone" id="joystick-zone">
+          <div class="sprint-icon">
+            <img src="assets/ui/icons/action_run.png" alt="Ø±ÙƒØ¶" class="sprint-icon-img" />
+          </div>
+          <div class="joystick-base">
+            <div class="joystick-thumb" id="joystick-thumb"></div>
+          </div>
+        </div>
+
+        <!-- Jump Action Button (Right Thumb) -->
+        <div class="action-buttons">
+          <button id="btn-action-jump" class="action-btn-circle btn-jump-soft" title="Ù‚ÙØ²">
+            <img src="assets/ui/icons/action_jump.png" alt="Ù‚ÙØ²" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Crosshair (Hidden for cinematic immersion) -->
+      <div id="crosshair" class="crosshair hidden"></div>
+
+      <!-- Mission Popup -->
+      <div id="mission-popup" class="mission-popup hidden">
+        <div class="mission-content widget-bg-panel">
+          <button class="mission-close" onclick="HUD.toggleMission(false)" title="Ø¥ØºÙ„Ø§Ù‚">
+            <img src="assets/ui/icons/btn_close.png" alt="Ø¥ØºÙ„Ø§Ù‚" class="icon-close-img" />
+          </button>
+          <h3>Ø§Ù„Ù…Ù‡Ù…Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©</h3>
+          <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+          <div class="mission-list" id="mission-task-list">
+            <div class="mission-item">
+              <img src="assets/ui/icons/hud_key.png" alt="Ù…ÙØªØ§Ø­" class="mission-item-icon" />
+              <span class="mission-text">Ø¬Ù…Ø¹ ÙƒÙ„ Ø§Ù„Ù…ÙØ§ØªÙŠØ­ Ù„ÙØªØ­ Ø§Ù„Ù…Ø®Ø±Ø¬</span>
+              <span class="mission-status" id="task-keys-status"><img src="assets/ui/icons/hud_timer.png" alt="Ù…Ø¹Ù„Ù‚" class="task-status-icon task-status-pending" /></span>
+            </div>
+            <div class="mission-divider-small"><img src="assets/ui/divider_small.png" alt="" class="divider-img" /></div>
+            <div class="mission-item">
+              <span class="mission-icon">ðŸšª</span>
+              <span class="mission-text">Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ø®Ø±ÙˆØ¬</span>
+              <span class="mission-status" id="task-exit-status"><img src="assets/ui/icons/hud_timer.png" alt="Ù…Ø¹Ù„Ù‚" class="task-status-icon task-status-pending" /></span>
+            </div>
+          </div>
+          <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+        </div>
+      </div>
+
+      <!-- Pickup Confirmation Dialog -->
+      <div id="pickup-dialog" class="pickup-dialog hidden">
+        <div class="pickup-card">
+          <div class="pickup-icon" id="pickup-icon">ðŸ—ï¸</div>
+          <p id="pickup-title">Ù„Ù‚Ø¯ ÙˆØ¬Ø¯Øª Ù…ÙØªØ§Ø­Ø§Ù‹ Ø£Ø³Ø·ÙˆØ±ÙŠØ§Ù‹!</p>
+          <p class="pickup-sub" id="pickup-sub">Ù‡Ù„ ØªØ±ÙŠØ¯ Ø§Ù„ØªÙ‚Ø§Ø·Ù‡ØŸ</p>
+          <div class="pickup-actions">
+            <button id="btn-pickup-yes" class="btn-confirm">Ù†Ø¹Ù…</button>
+            <button id="btn-pickup-no" class="btn-cancel">Ù„ÙŠØ³ Ø§Ù„Ø¢Ù†</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pause Menu Overlay -->
+    <div id="pause-menu" class="pause-menu hidden">
+      <div class="pause-backdrop"></div>
+      <div class="pause-panel">
+        <div class="pause-header">
+          <img src="assets/ui/icons/hud_settings.png" alt="Ø¥ÙŠÙ‚Ø§Ù" class="pause-settings-icon" />
+          <h3>ØªÙ… Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„Ù„Ø¹Ø¨Ø©</h3>
+          <div class="pause-title-divider"><img src="assets/ui/divider_mid.png" alt="" class="divider-img" /></div>
+        </div>
+
+        <div class="pause-stats-mini">
+          <div class="mini-stat widget-bg">
+            <span class="label">Ø§Ù„Ù…Ø±Ø­Ù„Ø©</span>
+            <span id="pause-level-val" class="value">1</span>
+          </div>
+          <div class="mini-stat widget-bg">
+            <img src="assets/ui/icons/hud_key.png" alt="Ù…ÙØªØ§Ø­" class="mini-key-icon" />
+            <span id="pause-keys-val" class="value">0/3</span>
+          </div>
+        </div>
+
+        <div class="pause-actions">
+          <button id="btn-resume" class="btn-main btn-glow">
+            <span class="btn-icon">â–¶</span>
+            <span>Ø§Ø³ØªÙ…Ø±Ø§Ø± Ø§Ù„Ù„Ø¹Ø¨</span>
+          </button>
+
+          <div class="pause-grid-buttons">
+            <button id="btn-save-progress" class="btn-pause-sub">
+              <span class="btn-icon">ðŸ’¾</span>
+              <span>Ø­ÙØ¸ Ø§Ù„ØªÙ‚Ø¯Ù…</span>
+            </button>
+            <button id="btn-storage" class="btn-pause-sub">
+              <span class="btn-icon">ðŸ“¦</span>
+              <span>Ø§Ù„ØªØ®Ø²ÙŠÙ†</span>
+            </button>
+          </div>
+
+          <button id="btn-settings-ingame" class="btn-main btn-secondary">
+            <span class="btn-icon">âš™ï¸</span>
+            <span>Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª</span>
+          </button>
+
+          <button id="btn-restart" class="btn-main btn-secondary">
+            <span class="btn-icon">ðŸ”„</span>
+            <span>Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø±Ø­Ù„Ø©</span>
+          </button>
+
+          <div class="pause-divider"></div>
+
+          <button id="btn-quit" class="btn-main btn-danger">
+            <span class="btn-icon">ðŸšª</span>
+            <span>Ø§Ù„Ø®Ø±ÙˆØ¬</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="screen-win" class="screen">
+    <div class="result-panel win">
+      <div class="result-icon">ðŸŽ‰</div>
+      <h2>Ø£Ø­Ø³Ù†Øª!</h2>
+      <div class="result-stats">
+        <div class="stat"><label>Ø§Ù„ÙˆÙ‚Øª</label><span id="win-time">--:--</span></div>
+        <div class="stat"><label>Ø§Ù„Ù†Ø¬ÙˆÙ…</label><span id="win-stars">â­â­â­</span></div>
+        <div class="stat"><label>Ø§Ù„Ù…ÙØ§ØªÙŠØ­</label><span id="win-keys">0/0</span></div>
+      </div>
+      <div class="result-buttons">
+        <button id="btn-next-level" class="btn-main btn-glow">Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„ØªØ§Ù„ÙŠØ© â–¶</button>
+        <button id="btn-win-menu" class="btn-main btn-secondary">Ø§Ù„Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOSE SCREEN ===== -->
+  <div id="screen-lose" class="screen">
+    <div class="result-panel lose">
+      <div class="result-icon">ðŸ’€</div>
+      <h2>Ø­Ø§ÙˆÙ„ Ù…Ø¬Ø¯Ø¯Ø§Ù‹</h2>
+      <div class="result-buttons">
+        <button id="btn-retry" class="btn-main btn-glow">Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© ðŸ”„</button>
+        <button id="btn-lose-menu" class="btn-main btn-secondary">Ø§Ù„Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOADING SCREEN ===== -->
+  <div id="screen-loading" class="screen hidden">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p id="loading-text">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</p>
+      <div class="loading-bar-wrap">
+        <div class="loading-bar" id="loading-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCRIPTS (type=module) ===== -->
+  <!-- Single module entry point -->
+  <script type="module" src="src/main.js"></script>
+
+</body>
+</html>

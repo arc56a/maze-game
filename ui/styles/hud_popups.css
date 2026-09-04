@@ -1,0 +1,323 @@
+/* =============================================
+   HUD POPUPS — Mission, Pickup, Pause
+   ============================================= */
+
+/* ---- Mission Popup ---- */
+.mission-popup {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+.mission-popup.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mission-content {
+  background-image: url('../../assets/ui/hud_widget_bg.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  border: 1px solid rgba(180,100,30,0.5);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5), 0 0 25px rgba(217,119,6,0.2);
+  border-radius: 24px;
+  padding: 24px 28px;
+  width: 320px;
+  max-width: 90vw;
+  position: relative;
+  transform: scale(1);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.mission-popup.hidden .mission-content { transform: scale(0.85); }
+
+.mission-close {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+.mission-close:hover { transform: scale(1.15) rotate(90deg); }
+.icon-close-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+
+.mission-content h3 {
+  margin: 0 0 16px;
+  color: #fbbf24;
+  font-size: 20px;
+  text-align: center;
+  font-weight: 900;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.mission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mission-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #eee;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.mission-icon    { font-size: 18px; }
+.mission-text    { flex: 1; text-align: right; }
+.mission-status  { font-weight: bold; }
+.mission-status.done { color: #22c55e; }
+
+.mission-item-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(251,150,36,0.5));
+}
+
+/* Status Icons Animations */
+.task-status-icon {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+.task-status-pending {
+  opacity: 0.75;
+  filter: drop-shadow(0 0 4px rgba(200,120,30,0.5));
+  animation: timerPulse 2.5s ease-in-out infinite;
+}
+.task-status-done {
+  filter: drop-shadow(0 0 10px rgba(100,255,120,0.7)) hue-rotate(80deg) saturate(1.5);
+  animation: donePulse 1.2s ease-out 1;
+}
+@keyframes timerPulse {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50%       { opacity: 1;    transform: scale(1.1); }
+}
+@keyframes donePulse {
+  0%   { transform: scale(0.7);  opacity: 0; }
+  60%  { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* ---- Pickup Dialog ---- */
+.pickup-dialog {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+  pointer-events: auto;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.pickup-dialog.hidden {
+  bottom: -100px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pickup-card {
+  background: rgba(15, 15, 25, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 24px;
+  padding: 20px 30px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.7), 0 0 20px rgba(251, 191, 36, 0.1);
+  min-width: 240px;
+}
+
+.pickup-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 8px #fbbf24);
+}
+
+.pickup-card p {
+  margin: 5px 0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+}
+.pickup-card .pickup-sub {
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.pickup-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.btn-confirm,
+.btn-cancel {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-confirm { background: linear-gradient(135deg, #fbbf24, #d97706); color: #000; }
+.btn-confirm:active { transform: scale(0.95); }
+.btn-cancel  { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-cancel:active  { transform: scale(0.95); background: rgba(255,255,255,0.2); }
+
+/* ---- Pause Menu ---- */
+.pause-menu {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.pause-menu.hidden { display: none !important; }
+
+.pause-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 20, 0.85);
+  backdrop-filter: blur(12px) saturate(180%);
+}
+
+.pause-panel {
+  position: relative;
+  background-image: url('../../assets/ui/hud_widget_bg.png');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(180, 100, 30, 0.4);
+  border-radius: 32px;
+  padding: 36px 28px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(217, 119, 6, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: pausePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes pausePop {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.pause-header { text-align: center; }
+.pause-settings-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(200,80,20,0.75));
+  animation: pauseIconSpin 14s linear infinite;
+  margin-bottom: 4px;
+}
+@keyframes pauseIconSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.pause-header h3 {
+  font-size: 24px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.pause-title-divider { display: flex; justify-content: center; margin: 6px 0 0; }
+
+.pause-stats-mini { display: flex; width: 100%; gap: 12px; }
+.mini-stat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.mini-stat .label { font-size: 11px; color: var(--clr-text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.mini-stat .value { font-size: 17px; font-weight: 700; color: var(--clr-accent); }
+.mini-key-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(251,150,36,0.55));
+}
+
+.pause-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* New Grid for sub buttons */
+.pause-grid-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+.btn-pause-sub {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--clr-glass-b);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  color: var(--clr-text);
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+.btn-pause-sub:hover {
+  background: rgba(217, 119, 6, 0.1);
+  border-color: var(--clr-primary);
+  transform: translateY(-2px);
+}
+.btn-pause-sub .btn-icon { font-size: 20px; }
+
+.pause-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  margin: 4px 0;
+}

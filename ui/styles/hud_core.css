@@ -1,0 +1,276 @@
+/* =============================================
+   HUD CORE — Layout, Top Bar & Widgets (Landscape First)
+   ============================================= */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  font-family: 'Tajawal', 'Rajdhani', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.hud * {
+  pointer-events: auto;
+}
+
+/* ---- Compact Top Bar (Landscape Optimized) ---- */
+.hud-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 42px; /* Slightly thinner for more game view */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px calc(var(--sar) + 14px) 4px calc(var(--sal) + 14px);
+  background: linear-gradient(to bottom, rgba(7, 7, 15, 0.7) 0%, rgba(7, 7, 15, 0.25) 70%, transparent 100%);
+  pointer-events: none;
+  z-index: 25;
+  gap: 8px;
+}
+
+.hud-top-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+/* ---- Celestial Badge (Time/Weather) ---- */
+.hud-celestial-badge {
+  background-image: url('../../assets/ui/hud_widget_bg.png');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(180, 100, 30, 0.35);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(0,0,0,0.25);
+  border-radius: 16px;
+  padding: 2px 8px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.hud-celestial-badge:hover {
+  border-color: rgba(251, 150, 36, 0.6);
+}
+
+.celestial-orbit-wrap {
+  width: 22px;
+  height: 22px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.celestial-orbit-ring {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(147, 197, 253, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.celestial-body-icon {
+  font-size: 11px;
+  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6));
+}
+
+.celestial-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.celestial-time {
+  font-size: 11px;
+  font-weight: 800;
+  color: #f8fafc;
+  font-family: 'Rajdhani', 'Tajawal', sans-serif;
+}
+
+.celestial-weather {
+  font-size: 9px;
+  font-weight: 700;
+  color: #93c5fd;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ---- HUD Buttons (Cam, Mission, Settings, Fullscreen) ---- */
+.hud-cam-btn,
+.hud-mission-btn,
+.hud-menu-btn,
+.hud-fs-btn {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+  position: relative;
+}
+
+.hud-cam-btn:hover,
+.hud-mission-btn:hover,
+.hud-menu-btn:hover,
+.hud-fs-btn:hover {
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 12px rgba(251, 150, 36, 0.7));
+}
+
+.hud-cam-btn:active,
+.hud-mission-btn:active,
+.hud-menu-btn:active,
+.hud-fs-btn:active {
+  transform: scale(0.9);
+}
+
+.hud-btn-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+}
+
+/* ---- Stat Widgets (Level, Timer, Keys) ---- */
+.hud-stat {
+  border-radius: 12px;
+  padding: 2px 8px;
+  height: 28px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffd580;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+  background-image: url('../../assets/ui/hud_widget_bg.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  border: 1px solid rgba(180, 100, 30, 0.3) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
+}
+
+.hud-key-icon-top,
+.hud-stat-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(251, 150, 36, 0.6));
+  flex-shrink: 0;
+}
+
+/* ---- Mission Alert Badge ---- */
+.mission-btn-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mission-alert {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 9px;
+  height: 9px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 8px #ef4444;
+  animation: pulseGlow 1s infinite;
+}
+
+.mission-toast {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fbbf24;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+.mission-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- Vitals Overlay (Health & Stamina Bars - Compact) ---- */
+.hud-vitals {
+  position: absolute;
+  top: 54px;
+  left: calc(var(--sal) + 14px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+  z-index: 23;
+}
+
+.vital-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.vital-icon {
+  font-size: 11px;
+  width: 14px;
+  text-align: center;
+}
+
+.vital-bar-bg {
+  width: 90px;
+  height: 6px;
+  background: rgba(10, 10, 15, 0.75);
+  border: 1px solid rgba(180, 100, 30, 0.4);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+
+.vital-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  width: 100%;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.health-bar-fill {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+}
+
+.stamina-bar-fill {
+  background: linear-gradient(90deg, #fbbf24 0%, #d97706 100%);
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+}

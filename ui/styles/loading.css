@@ -1,0 +1,159 @@
+/* =============================================
+   PROFESSIONAL LOADING SCREEN — Mobile Landscape
+   ============================================= */
+
+#screen-loading {
+  background: #000;
+  z-index: 99999; /* Ensure it covers everything */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+#screen-loading.active {
+  display: flex;
+}
+
+/* Background Layer */
+.loading-bg-blur {
+  position: absolute;
+  inset: 0;
+  background: url('../../assets/ui/loading_bg.png') center center / cover no-repeat;
+  z-index: -1;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+/* Spinning Logo / Icon */
+.loading-logo-wrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.loading-spinner-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid rgba(251, 191, 36, 0.1);
+  border-top: 3px solid #fbbf24;
+  border-radius: 50%;
+  animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.loading-icon-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  height: 60%;
+  filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.6));
+  animation: pulseIcon 2s ease-in-out infinite alternate;
+}
+
+.loading-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+@keyframes pulseIcon {
+  from { transform: scale(1); opacity: 0.8; }
+  to   { transform: scale(1.15); opacity: 1; }
+}
+
+/* Progress Section */
+.loading-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+#loading-text {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.loading-bar-wrap {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.loading-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loading-percentage {
+  position: absolute;
+  right: 0;
+  top: -24px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #fbbf24;
+}
+
+/* Tip Section */
+.loading-tip-box {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  max-width: 400px;
+}
+
+.loading-tip-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 900;
+  color: #fbbf24;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+#loading-tip-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+/* Media Queries for Landscape height */
+@media (max-height: 400px) {
+  .loading-logo-wrap { width: 70px; height: 70px; }
+  .loading-icon-inner { font-size: 30px; }
+  .loading-content { gap: 16px; }
+  #loading-text { font-size: 15px; }
+  .loading-tip-box { margin-top: 10px; padding: 8px 16px; }
+}

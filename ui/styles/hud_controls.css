@@ -1,0 +1,164 @@
+/* =============================================
+   HUD CONTROLS — Clean Floating Mobile Controls (Landscape First)
+   ============================================= */
+
+.mobile-controls {
+  direction: ltr !important;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 calc(var(--sar) + 16px) calc(var(--sab) + 12px) calc(var(--sal) + 16px);
+  pointer-events: none;
+  z-index: 22;
+}
+
+/* ---- Left Thumb Zone: Joystick ---- */
+.joystick-zone {
+  width: 130px;
+  height: 130px;
+  touch-action: none;
+  position: relative;
+  margin-bottom: 2px;
+  pointer-events: auto;
+}
+
+.sprint-icon {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  opacity: 0.35;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: grayscale(0.8);
+  pointer-events: none;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sprint-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
+}
+
+.sprint-icon.active {
+  opacity: 1;
+  filter: grayscale(0) drop-shadow(0 0 14px #fbbf24);
+  transform: translateX(-50%) scale(1.2);
+}
+
+.joystick-base {
+  width: 95px;  /* Compact size for better visibility */
+  height: 95px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(251, 191, 36, 0.25);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(10, 14, 28, 0.35) 100%);
+  backdrop-filter: blur(4px);
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.4);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.joystick-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fbbf24 0%, #d97706 70%, #78350f 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.5);
+  position: absolute;
+  transition: none;
+  z-index: 3;
+}
+
+/* ---- Right Thumb Zone: Dedicated Floating Jump Button ---- */
+.action-buttons-cluster {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  pointer-events: auto;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon-btn {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  outline: none !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7));
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+}
+
+.action-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+}
+
+/* Dedicated Jump Button */
+.btn-jump-soft {
+  width: 66px;
+  height: 66px;
+}
+
+.btn-jump-soft:active .action-icon-img {
+  transform: scale(0.85);
+  filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.95)) brightness(1.25);
+}
+
+/* Responsive adjustment for short landscape devices (< 400px height) */
+@media (max-height: 400px) {
+  .mobile-controls {
+    height: 130px;
+  }
+  .joystick-zone {
+    width: 110px;
+    height: 110px;
+  }
+  .joystick-base {
+    width: 90px;
+    height: 90px;
+  }
+  .joystick-thumb {
+    width: 38px;
+    height: 38px;
+  }
+  .action-buttons-cluster {
+    width: 75px;
+    height: 75px;
+  }
+  .btn-jump-soft {
+    width: 56px;
+    height: 56px;
+  }
+}

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="متاهة الظلام - لعبة مغامرة واستكشاف المتاهة ثلاثية الأبعاد" />
+  <title>متاهة الظلام — Maze of Darkness 3D</title>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Import Map — Three.js ESM -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":                        "./libs/three.min.js",
+      "three/addons/":                "./libs/addons/"
+    }
+  }
+  </script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>" />
+
+  <!-- Game CSS -->
+  <link rel="stylesheet" href="ui/styles/main.css" />
+</head>
+<body>
+
+  <!-- ===== ROTATE DEVICE OVERLAY (Mobile Portrait Warning) ===== -->
+  <div id="orientation-overlay" class="orientation-overlay">
+    <div class="orientation-panel">
+      <div class="phone-rotate-anim">
+        <svg class="phone-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="15" width="40" height="70" rx="8" stroke="#fbbf24" stroke-width="3.5" fill="rgba(251,191,36,0.1)"/>
+          <line x1="45" y1="22" x2="55" y2="22" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="50" cy="76" r="3.5" fill="#fbbf24"/>
+          <path class="rotate-arrow" d="M 78 35 A 35 35 0 0 1 78 65" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="4 2"/>
+          <polygon points="82,65 74,68 76,60" fill="#f59e0b"/>
+        </svg>
+      </div>
+      <h2>يرجى تدوير الهاتف</h2>
+      <p>تم تصميم اللعبة خصيصاً للعمل بالوضع العرضي <strong>(Landscape)</strong> لتحكم سلس ورؤية كاملة للمتاهة</p>
+      <button id="btn-force-fullscreen" class="btn-rotate-fullscreen" onclick="UI.requestFullscreenAndLandscape()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <span>ملء الشاشة بالعرض 📱</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== PROFILE SETUP SCREEN ===== -->
+  <div id="screen-profile" class="screen">
+    <div class="menu-bg"></div>
+    <div class="section-panel section-panel-landscape">
+      <h2>إنشاء ملف تعريف</h2>
+      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+
+      <div class="profile-landscape-layout">
+        <div class="profile-preview-col">
+          <div class="gender-card active" id="card-hero" onclick="ProfileUI.selectGender('hero')">
+            <div class="gender-preview hero-bg" id="preview-hero">
+              <!-- 3D Canvas will be injected here -->
+            </div>
+            <span class="gender-name">المغامرة (الأساسية)</span>
+          </div>
+        </div>
+
+        <div class="profile-form-col">
+          <div class="input-group">
+            <label for="profile-name">اسم اللاعب</label>
+            <input type="text" id="profile-name" placeholder="أدخل اسمك هنا..." maxlength="15" autocomplete="off">
+            <span id="name-error" class="error-msg">الاسم يجب أن يكون حروف فقط (3-15 حرف)</span>
+          </div>
+
+          <button id="btn-save-profile" class="btn-main btn-glow" onclick="ProfileUI.save()">
+            <span>بدء المغامرة ▶</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN MENU SCREEN ===== -->
+  <div id="screen-menu" class="screen">
+    <audio id="menu-audio" src="assets/sounds/menu_theme.mp3" loop preload="auto"></audio>
+    <div class="menu-bg"></div>
+
+
+
+    <!-- Centered Menu Content (Landscape) -->
+    <div class="menu-content menu-content-centered">
+      <div class="menu-buttons-column">
+        <button id="btn-play" class="btn-banner-wrap btn-play-wrap" title="بدء اللعب">
+          <img src="assets/ui/icons/btn_play.png" alt="بدء اللعب" class="btn-banner-img" />
+        </button>
+        <button id="btn-levels" class="btn-banner-wrap" title="المراحل">
+          <img src="assets/ui/icons/btn_stages.png" alt="المراحل" class="btn-banner-img" />
+        </button>
+        <button id="btn-account" class="btn-banner-wrap" title="الحساب">
+          <img src="assets/ui/icons/btn_account.png" alt="الحساب" class="btn-banner-img" />
+        </button>
+        <button id="btn-settings" class="btn-banner-wrap" title="الإعدادات">
+          <img src="assets/ui/icons/btn_settings.png" alt="الإعدادات" class="btn-banner-img" />
+        </button>
+        <button id="btn-about" class="btn-banner-wrap" title="حول اللعبة">
+          <img src="assets/ui/icons/btn_about.png" alt="حول اللعبة" class="btn-banner-img" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Version Tag AAA Style -->
+    <div class="menu-version-tag">v1.0</div>
+  </div>
+
+  <!-- ===== LEVEL SELECT SCREEN ===== -->
+  <div id="screen-levels" class="screen">
+    <div class="menu-bg"></div>
+    <div class="mobile-screen-panel">
+      <div class="mobile-screen-header">
+        <button class="mobile-back-btn" onclick="UI.showScreen('menu')" title="رجوع">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 class="mobile-screen-title">اختر المرحلة</h2>
+        <div class="mobile-screen-title-spacer"></div>
+      </div>
+      <div class="mobile-screen-body">
+        <div id="levels-grid" class="levels-grid-mobile">
+          <!-- Levels injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS SCREEN ===== -->
+  <div id="screen-settings" class="screen">
+    <div class="menu-bg"></div>
+    <div class="mobile-screen-panel mobile-screen-panel--wide">
+      <div class="mobile-screen-header">
+        <button class="mobile-back-btn" onclick="UI.goBack()" title="رجوع">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 class="mobile-screen-title">الإعدادات</h2>
+        <div class="mobile-screen-title-spacer"></div>
+      </div>
+      <div class="settings-landscape-layout">
+        <!-- Left Tabs -->
+        <div class="settings-tabs-mobile">
+          <button class="stab active" onclick="Settings.showTab('gameplay')">🎮 اللعب</button>
+          <button class="stab" onclick="Settings.showTab('audio')">🔊 الصوت</button>
+          <button class="stab" onclick="Settings.showTab('controls')">🕹️ التحكم</button>
+          <button class="stab" onclick="Settings.showTab('graphics')">⚡ الجرافيك</button>
+        </div>
+        <!-- Right Content -->
+        <div class="settings-content-mobile">
+          <div class="settings-list" id="settings-gameplay">
+            <div class="setting-row">
+              <span class="setting-row-label">وضع الكاميرا</span>
+              <div class="toggle-group">
+                <button id="cam-first" class="toggle-btn active" onclick="Settings.setCameraMode('first')">منظور 1</button>
+                <button id="cam-third" class="toggle-btn" onclick="Settings.setCameraMode('third')">منظور 3</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">ملء الشاشة</span>
+              <div class="toggle-group">
+                <button id="phone-fullscreen-on" class="toggle-btn active" onclick="Settings.setMobileFullscreen(true)">تمكين</button>
+                <button id="phone-fullscreen-off" class="toggle-btn" onclick="Settings.setMobileFullscreen(false)">إيقاف</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">اتجاه الشاشة</span>
+              <div class="toggle-group">
+                <button id="phone-landscape-on" class="toggle-btn active" onclick="Settings.setAutoLandscape(true)">عرضي</button>
+                <button id="phone-landscape-off" class="toggle-btn" onclick="Settings.setAutoLandscape(false)">قياسي</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-list hidden" id="settings-audio">
+            <div class="setting-row">
+              <span class="setting-row-label">صوت القائمة</span>
+              <div class="setting-range-wrap">
+                <input type="range" id="setting-vol-menu" min="0" max="1" step="0.05" value="0.5" class="setting-range" oninput="Settings.setVolMenu(this.value)">
+                <span class="range-val" id="val-vol-menu">50%</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">صوت اللعب</span>
+              <div class="setting-range-wrap">
+                <input type="range" id="setting-vol-game" min="0" max="1" step="0.05" value="0.4" class="setting-range" oninput="Settings.setVolGame(this.value)">
+                <span class="range-val" id="val-vol-game">40%</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">صوت المطر</span>
+              <div class="setting-range-wrap">
+                <input type="range" id="setting-vol-rain" min="0" max="1" step="0.05" value="0.5" class="setting-range" oninput="Settings.setVolRain(this.value)">
+                <span class="range-val" id="val-vol-rain">50%</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">صوت البرق</span>
+              <div class="setting-range-wrap">
+                <input type="range" id="setting-vol-thunder" min="0" max="1" step="0.05" value="0.8" class="setting-range" oninput="Settings.setVolThunder(this.value)">
+                <span class="range-val" id="val-vol-thunder">80%</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">مؤثرات (SFX)</span>
+              <div class="toggle-group">
+                <button id="sfx-on" class="toggle-btn active" onclick="Settings.toggleSFX(true)">تشغيل</button>
+                <button id="sfx-off" class="toggle-btn" onclick="Settings.toggleSFX(false)">إيقاف</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-list hidden" id="settings-controls">
+            <div class="setting-row">
+              <span class="setting-row-label">حساسية اللمس</span>
+              <div class="setting-range-wrap">
+                <input type="range" id="setting-sens" min="0.5" max="2.0" step="0.1" value="1.0" class="setting-range" oninput="Settings.setSensitivity(this.value)">
+                <span class="range-val" id="range-sens-val">1.0x</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">اهتزاز (Haptic)</span>
+              <div class="toggle-group">
+                <button id="haptic-on" class="toggle-btn active" onclick="Settings.setHaptic(true)">تشغيل</button>
+                <button id="haptic-off" class="toggle-btn" onclick="Settings.setHaptic(false)">إيقاف</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-list hidden" id="settings-graphics">
+            <div class="setting-row">
+              <span class="setting-row-label">جودة الرسوم</span>
+              <div class="toggle-group">
+                <button id="q-low" class="toggle-btn" onclick="Settings.setQuality('low')">منخفضة</button>
+                <button id="q-med" class="toggle-btn active" onclick="Settings.setQuality('medium')">متوسطة</button>
+                <button id="q-high" class="toggle-btn" onclick="Settings.setQuality('high')">عالية</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">تنعيم الحواف</span>
+              <div class="toggle-group">
+                <button id="aa-on" class="toggle-btn active" onclick="Settings.toggleAA(true)">تشغيل</button>
+                <button id="aa-off" class="toggle-btn" onclick="Settings.toggleAA(false)">إيقاف</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">الظلال</span>
+              <div class="toggle-group">
+                <button id="shadows-on" class="toggle-btn active" onclick="Settings.toggleShadows(true)">تشغيل</button>
+                <button id="shadows-off" class="toggle-btn" onclick="Settings.toggleShadows(false)">إيقاف</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">الحشائش</span>
+              <div class="toggle-group">
+                <button id="grass-on" class="toggle-btn active" onclick="Settings.toggleGrass(true)">تشغيل</button>
+                <button id="grass-off" class="toggle-btn" onclick="Settings.toggleGrass(false)">إيقاف</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">مؤثرات المطر</span>
+              <div class="toggle-group">
+                <button id="rain-on" class="toggle-btn active" onclick="Settings.toggleRain(true)">تشغيل</button>
+                <button id="rain-off" class="toggle-btn" onclick="Settings.toggleRain(false)">إيقاف</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-footer-actions">
+            <div class="settings-status-inline" id="settings-status-msg"></div>
+            <button class="btn-settings-save" onclick="Settings.confirmSave()">💾 حفظ</button>
+            <button class="btn-settings-reset" onclick="Settings.resetToDefaults()">↺ استعادة</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ACCOUNT SCREEN ===== -->
+  <div id="screen-account" class="screen">
+    <div class="menu-bg"></div>
+    <div class="mobile-screen-panel mobile-screen-panel--wide">
+      <div class="mobile-screen-header">
+        <button class="mobile-back-btn" onclick="UI.showScreen('menu')" title="رجوع">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 class="mobile-screen-title">ملف اللاعب</h2>
+        <div class="mobile-screen-title-spacer"></div>
+      </div>
+      <div class="account-mobile-layout">
+        <!-- Left: Avatar -->
+        <div class="account-avatar-col">
+          <div class="account-avatar-frame">
+            <div id="acc-preview-box" class="account-avatar-canvas"></div>
+          </div>
+          <div class="account-char-badge" id="acc-gender-label">المغامرة</div>
+          <button class="btn-char-switch" onclick="UI.showScreen('char-select')">تغيير الشخصية</button>
+        </div>
+        <!-- Right: Info & Stats -->
+        <div class="account-info-col">
+          <div class="account-name-field">
+            <label class="field-label">اسم اللاعب</label>
+            <input type="text" id="acc-name-input" class="field-input" maxlength="15" placeholder="أدخل اسمك...">
+          </div>
+          <div class="account-stats-row">
+            <div class="stat-chip">
+              <span class="stat-chip-val" id="acc-levels">0</span>
+              <span class="stat-chip-lbl">مراحل</span>
+            </div>
+            <div class="stat-chip">
+              <span class="stat-chip-val" id="acc-time">0د</span>
+              <span class="stat-chip-lbl">وقت اللعب</span>
+            </div>
+            <div class="stat-chip">
+              <span class="stat-chip-val" id="acc-age">جديد</span>
+              <span class="stat-chip-lbl">عمر الحساب</span>
+            </div>
+          </div>
+          <div class="account-action-btns">
+            <button class="btn-acc-save" onclick="ProfileUI.saveAccountChanges()">💾 حفظ</button>
+            <button class="btn-acc-reset" onclick="ProfileUI.resetAccount()">🗑 إعادة ضبط</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARACTER SELECTION SCREEN ===== -->
+  <div id="screen-char-select" class="screen">
+    <div class="menu-bg"></div>
+    <div class="mobile-screen-panel">
+      <div class="mobile-screen-header">
+        <button class="mobile-back-btn" onclick="UI.showScreen('account')" title="رجوع">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 class="mobile-screen-title">اختر الشخصية</h2>
+        <div class="mobile-screen-title-spacer"></div>
+      </div>
+      <div class="mobile-screen-body">
+        <div id="char-list" class="char-list-mobile">
+          <!-- Injected by ProfileUI.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ABOUT SCREEN ===== -->
+  <div id="screen-about" class="screen">
+    <div class="menu-bg"></div>
+    <div class="mobile-screen-panel">
+      <div class="mobile-screen-header">
+        <button class="mobile-back-btn" onclick="UI.showScreen('menu')" title="رجوع">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 class="mobile-screen-title">حول اللعبة</h2>
+        <div class="mobile-screen-title-spacer"></div>
+      </div>
+      <div class="about-mobile-layout">
+        <div class="about-logo-col">
+          <div class="about-icon">
+            <img src="assets/ui/icons/circular icon for downloading.png" alt="Logo" class="about-icon-img" />
+          </div>
+          <h3 class="about-game-title">MAZE OF DARKNESS</h3>
+          <span class="about-version">v1.0</span>
+        </div>
+        <div class="about-text-col">
+          <p class="about-desc">لعبة متاهة ثلاثية الأبعاد مثيرة، استكشف الممرات الغامضة، اجمع المفاتيح، وابحث عن مخرج النور السحري.</p>
+          <div class="about-tags">
+            <span class="about-tag">📱 هاتف عرضي</span>
+            <span class="about-tag">🎮 تحكم لمسي</span>
+            <span class="about-tag">⚡ ثري دي</span>
+          </div>
+          <p class="about-dev">تصميم وتطوير: المطور المحترف</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== GAME SCREEN ===== -->
+  <div id="screen-game" class="screen">
+
+    <!-- Three.js Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD Overlay -->
+    <div id="hud" class="hud">
+
+      <!-- Top Bar -->
+      <div class="hud-top">
+        <!-- Start / Left Section: Level, Weather & Time, Cam Toggle -->
+        <div class="hud-top-section hud-top-start">
+          <div class="hud-stat hud-level-widget" id="hud-level">مرحلة <span id="hud-level-num">1</span></div>
+          <!-- Celestial Orbit & Weather Badge -->
+          <div class="hud-celestial-badge" id="hud-celestial-badge">
+            <div class="celestial-orbit-wrap">
+              <div class="celestial-orbit-ring" id="celestial-orbit-ring">
+                <span class="celestial-body-icon" id="celestial-body-icon">☀️</span>
+              </div>
+            </div>
+            <div class="celestial-info">
+              <span class="celestial-time" id="celestial-time-text">08:00 ص</span>
+              <span class="celestial-weather" id="celestial-weather-badge">
+                <span id="celestial-weather-icon">☀️</span>
+                <span id="celestial-weather-name">نهار مشرق</span>
+              </span>
+            </div>
+          </div>
+          <button id="btn-cam-toggle" class="hud-cam-btn" title="تبديل الكاميرا">
+            <img src="assets/ui/icons/cam_first.png" alt="تبديل الكاميرا" class="hud-btn-img" />
+          </button>
+        </div>
+
+        <!-- Center Section: Timer only -->
+        <div class="hud-top-section hud-top-center">
+          <div class="hud-stat" id="hud-timer">
+            <img src="assets/ui/icons/hud_timer.png" alt="وقت" class="hud-stat-icon" />
+            <span id="hud-time">00:00</span>
+          </div>
+        </div>
+
+        <!-- End / Actions Section: Keys Counter + Mission Button + Fullscreen + Settings Button -->
+        <div class="hud-top-section hud-top-end">
+          <!-- Keys counter next to mission -->
+          <div class="hud-stat hud-key-widget" id="hud-coins">
+            <img src="assets/ui/icons/hud_key.png" alt="مفتاح" class="hud-key-icon-top" />
+            <span id="hud-keys">0/0</span>
+          </div>
+          <div class="mission-btn-wrap">
+            <button id="btn-mission" class="hud-mission-btn" title="المهمة">
+              <span id="mission-alert" class="mission-alert hidden"></span>
+              <img src="assets/ui/icons/btn_task.png" alt="المهمة" class="hud-btn-img" />
+            </button>
+            <div id="mission-toast" class="mission-toast hidden">تم إكمال المهمة!</div>
+          </div>
+          <button id="btn-hud-fullscreen" class="hud-menu-btn hud-fs-btn" title="ملء الشاشة" onclick="UI.toggleFullscreen()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          </button>
+          <button id="btn-pause" class="hud-menu-btn hud-settings-btn" title="الإعدادات / إيقاف">
+            <img src="assets/ui/icons/hud_settings.png" alt="إعدادات" class="hud-btn-img" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Vitals Overlay (Health & Stamina Bars) -->
+      <div class="hud-vitals" id="hud-vitals">
+        <div class="vital-row health-row">
+          <span class="vital-icon">❤️</span>
+          <div class="vital-bar-bg">
+            <div class="vital-bar-fill health-bar-fill" id="health-bar-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="vital-row stamina-row">
+          <span class="vital-icon">⚡</span>
+          <div class="vital-bar-bg">
+            <div class="vital-bar-fill stamina-bar-fill" id="stamina-bar-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Controls (Landscape Optimized - Minimal & Dedicated) -->
+      <div id="mobile-controls" class="mobile-controls">
+        <!-- Joystick Movement (Left Thumb Zone) -->
+        <div class="joystick-zone" id="joystick-zone">
+          <div class="sprint-icon">
+            <img src="assets/ui/icons/action_run.png" alt="ركض" class="sprint-icon-img" />
+          </div>
+          <div class="joystick-base">
+            <div class="joystick-thumb" id="joystick-thumb"></div>
+          </div>
+        </div>
+
+        <!-- Action Button (Right Thumb Zone - Dedicated Jump Button) -->
+        <div class="action-buttons-cluster">
+          <button id="btn-action-jump" class="action-icon-btn btn-jump-soft" title="قفز">
+            <img src="assets/ui/icons/action_jump.png" alt="قفز" class="action-icon-img" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Crosshair (Hidden for cinematic immersion) -->
+      <div id="crosshair" class="crosshair hidden"></div>
+
+      <!-- Mission Popup -->
+      <div id="mission-popup" class="mission-popup hidden">
+        <div class="mission-content widget-bg-panel">
+          <button class="mission-close" onclick="HUD.toggleMission(false)" title="إغلاق">
+            <img src="assets/ui/icons/btn_close.png" alt="إغلاق" class="icon-close-img" />
+          </button>
+          <h3>المهمة الحالية</h3>
+          <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+          <div class="mission-list" id="mission-task-list">
+            <div class="mission-item">
+              <img src="assets/ui/icons/hud_key.png" alt="مفتاح" class="mission-item-icon" />
+              <span class="mission-text">جمع كل المفاتيح لفتح المخرج</span>
+              <span class="mission-status" id="task-keys-status"><img src="assets/ui/icons/hud_timer.png" alt="معلق" class="task-status-icon task-status-pending" /></span>
+            </div>
+            <div class="mission-divider-small"><img src="assets/ui/divider_small.png" alt="" class="divider-img" /></div>
+            <div class="mission-item">
+              <span class="mission-icon">🚪</span>
+              <span class="mission-text">الوصول إلى بوابة الخروج</span>
+              <span class="mission-status" id="task-exit-status"><img src="assets/ui/icons/hud_timer.png" alt="معلق" class="task-status-icon task-status-pending" /></span>
+            </div>
+          </div>
+          <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+        </div>
+      </div>
+
+      <!-- Pickup Confirmation Dialog -->
+      <div id="pickup-dialog" class="pickup-dialog hidden">
+        <div class="pickup-card">
+          <div class="pickup-icon" id="pickup-icon">🗝️</div>
+          <p id="pickup-title">لقد وجدت مفتاحاً أسطورياً!</p>
+          <p class="pickup-sub" id="pickup-sub">هل تريد التقاطه؟</p>
+          <div class="pickup-actions">
+            <button id="btn-pickup-yes" class="btn-confirm">نعم</button>
+            <button id="btn-pickup-no" class="btn-cancel">ليس الآن</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pause Menu Overlay -->
+    <div id="pause-menu" class="pause-menu hidden">
+      <div class="pause-backdrop"></div>
+      <div class="pause-panel">
+        <div class="pause-header">
+          <img src="assets/ui/icons/hud_settings.png" alt="إيقاف" class="pause-settings-icon" />
+          <h3>تم إيقاف اللعبة</h3>
+          <div class="pause-title-divider"><img src="assets/ui/divider_mid.png" alt="" class="divider-img" /></div>
+        </div>
+
+        <div class="pause-stats-mini">
+          <div class="mini-stat widget-bg">
+            <span class="label">المرحلة</span>
+            <span id="pause-level-val" class="value">1</span>
+          </div>
+          <div class="mini-stat widget-bg">
+            <img src="assets/ui/icons/hud_key.png" alt="مفتاح" class="mini-key-icon" />
+            <span id="pause-keys-val" class="value">0/3</span>
+          </div>
+        </div>
+
+        <div class="pause-actions">
+          <button id="btn-resume" class="btn-main btn-glow">
+            <span class="btn-icon">▶</span>
+            <span>استمرار اللعب</span>
+          </button>
+
+          <div class="pause-grid-buttons">
+            <button id="btn-save-progress" class="btn-pause-sub">
+              <span class="btn-icon">💾</span>
+              <span>حفظ التقدم</span>
+            </button>
+            <button id="btn-storage" class="btn-pause-sub">
+              <span class="btn-icon">📦</span>
+              <span>التخزين</span>
+            </button>
+          </div>
+
+          <button id="btn-settings-ingame" class="btn-main btn-secondary">
+            <span class="btn-icon">⚙️</span>
+            <span>الإعدادات</span>
+          </button>
+
+          <button id="btn-restart" class="btn-main btn-secondary">
+            <span class="btn-icon">🔄</span>
+            <span>إعادة المرحلة</span>
+          </button>
+
+          <div class="pause-divider"></div>
+
+          <button id="btn-quit" class="btn-main btn-danger">
+            <span class="btn-icon">🚪</span>
+            <span>الخروج</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="screen-win" class="screen">
+    <div class="result-panel win">
+      <div class="result-icon">🎉</div>
+      <h2>أحسنت!</h2>
+      <div class="result-stats">
+        <div class="stat"><label>الوقت</label><span id="win-time">--:--</span></div>
+        <div class="stat"><label>النجوم</label><span id="win-stars">⭐⭐⭐</span></div>
+        <div class="stat"><label>المفاتيح</label><span id="win-keys">0/0</span></div>
+      </div>
+      <div class="result-buttons">
+        <button id="btn-next-level" class="btn-main btn-glow">المرحلة التالية ▶</button>
+        <button id="btn-win-menu" class="btn-main btn-secondary">القائمة الرئيسية</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOSE SCREEN ===== -->
+  <div id="screen-lose" class="screen">
+    <div class="result-panel lose">
+      <div class="result-icon">💀</div>
+      <h2>حاول مجدداً</h2>
+      <div class="result-buttons">
+        <button id="btn-retry" class="btn-main btn-glow">إعادة المحاولة 🔄</button>
+        <button id="btn-lose-menu" class="btn-main btn-secondary">القائمة الرئيسية</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOADING SCREEN ===== -->
+  <div id="screen-loading" class="screen">
+    <div class="loading-bg-blur"></div>
+    <div class="loading-content">
+      <div class="loading-logo-wrap">
+        <div class="loading-spinner-ring"></div>
+        <div class="loading-icon-inner">
+          <img src="assets/ui/icons/circular icon for downloading.png" alt="تحميل" class="loading-icon-img" />
+        </div>
+      </div>
+
+      <div class="loading-info">
+        <p id="loading-text">جاري تهيئة المرحلة...</p>
+        <div class="loading-bar-wrap">
+          <div class="loading-bar" id="loading-bar"></div>
+        </div>
+      </div>
+
+      <div class="loading-tip-box">
+        <span class="loading-tip-label">نصيحة سريعة</span>
+        <p id="loading-tip-text">اجمع كل المفاتيح لفتح بوابة الخروج السحرية!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCRIPTS (type=module) ===== -->
+  <!-- Single module entry point -->
+  <script type="module" src="src/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,208 @@
+/* =============================================
+   GLOBAL STYLES & VARIABLES — Mobile Landscape First
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&family=Rajdhani:wght@500;600;700;800&display=swap');
+
+:root {
+  --clr-bg:        #07070f;
+  --clr-bg2:       #0d0d1a;
+  --clr-primary:   #d97706;
+  --clr-accent:    #fbbf24;
+  --clr-gold:      #fcd34d;
+  --clr-danger:    #ef4444;
+  --clr-success:   #22c55e;
+  --clr-text:      #f8fafc;
+  --clr-text-dim:  #94a3b8;
+  --clr-wall:      #1e1b4b;
+  --clr-floor:     #1a1a2e;
+  --clr-glass:     rgba(255,255,255,0.04);
+  --clr-glass-b:   rgba(255,255,255,0.10);
+  --radius:        16px;
+  --radius-sm:     8px;
+  --shadow-glow:   0 0 30px rgba(217, 119, 6, 0.4);
+  --shadow-card:   0 12px 48px rgba(0,0,0,0.85);
+  --transition:    0.25s cubic-bezier(0.4,0,0.2,1);
+
+  /* Safe Area Insets for Mobile Notches & Bars */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--clr-bg);
+  font-family: 'Tajawal', 'Rajdhani', sans-serif;
+  color: var(--clr-text);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+}
+
+/* =============================================
+   ORIENTATION ROTATE OVERLAY (Portrait Warning)
+   ============================================= */
+.orientation-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 24px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+/* Show only when in portrait orientation on touch/mobile devices */
+@media (orientation: portrait) and (max-width: 1024px) {
+  .orientation-overlay {
+    display: flex;
+  }
+}
+
+.orientation-panel {
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 28px;
+  padding: 32px 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(217, 119, 6, 0.2);
+  animation: float 4s ease-in-out infinite;
+}
+
+.phone-rotate-anim {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.phone-svg {
+  width: 100%;
+  height: 100%;
+  animation: rotatePhone 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center center;
+}
+
+@keyframes rotatePhone {
+  0%, 15% { transform: rotate(0deg); }
+  50%, 80% { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.orientation-panel h2 {
+  font-size: 26px;
+  font-weight: 900;
+  color: #fbbf24;
+  text-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
+}
+
+.orientation-panel p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.orientation-panel p strong {
+  color: #fbbf24;
+}
+
+.btn-rotate-fullscreen {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: #000;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.4);
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.btn-rotate-fullscreen:active {
+  transform: scale(0.95);
+  filter: brightness(1.15);
+}
+
+/* =============================================
+   SCREEN BASE & LANDSCAPE CONTAINER
+   ============================================= */
+.screen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  overflow: hidden;
+  padding: var(--sat) var(--sar) var(--sab) var(--sal);
+}
+
+.screen.active {
+  display: flex;
+}
+
+.screen.hidden, .hidden {
+  display: none !important;
+}
+
+/* Background canvas / layers (Cinematic Mobile Landscape) */
+.menu-bg {
+  position: absolute;
+  inset: 0;
+  background: url('../../assets/ui/menu_bg.png') center 35% / cover no-repeat;
+  z-index: 0;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+  50%       { opacity: 0.7; box-shadow: 0 0 30px rgba(251, 191, 36, 0.8); }
+}

@@ -1,0 +1,22 @@
+/* =============================================
+   MAZE GAME 3D — MAIN STYLE HUB
+   This file imports all modular CSS files.
+   ============================================= */
+
+/* 1. Global & Reset */
+@import url('./global.css');
+
+/* 2. Reusable Components */
+@import url('./components.css');
+
+/* 3. Screen Specific Styles */
+@import url('./screens.css');
+
+/* 4. Menu & UI Animations */
+@import url('./menu.css');
+
+/* 5. In-Game HUD */
+@import url('./hud.css');
+
+/* 6. Loading Screen */
+@import url('./loading.css');

@@ -1,0 +1,167 @@
+/* =============================================
+   HUD OVERLAY — Minimap, Effects & Extras
+   ============================================= */
+
+/* Minimap removed — see index.html comment */
+
+
+/* ---- Crosshair ---- */
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+}
+.crosshair.hidden { display: none; }
+
+/* ---- Mission Alert Dot ---- */
+.mission-alert {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background: #ef4444;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+  z-index: 5;
+  animation: pulse-alert 1.5s infinite;
+}
+.mission-alert.hidden { display: none !important; }
+@keyframes pulse-alert {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.3); opacity: 0.8; }
+}
+
+/* ---- Mission Toast Notification ---- */
+.mission-toast {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  color: #86efac;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(34, 197, 94, 0.3);
+  transform: translateY(-8px);
+  opacity: 0;
+  transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 30;
+}
+.mission-toast.visible { transform: translateY(0); opacity: 1; }
+.mission-toast.hidden  { display: none !important; }
+
+/* ---- Level Clear Overlay ---- */
+.level-clear-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 30;
+}
+.level-clear-text {
+  font-size: 64px;
+  font-weight: 900;
+  color: var(--clr-gold);
+  text-shadow: 0 0 40px rgba(217, 119, 6, 0.8);
+  animation: levelClear 1s ease-out forwards;
+}
+@keyframes levelClear {
+  from { opacity: 0; transform: scale(0.5); }
+  50%  { opacity: 1; transform: scale(1.1); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Damage Flash ---- */
+.damage-flash {
+  position: absolute;
+  inset: 0;
+  background: rgba(239,68,68,0.3);
+  pointer-events: none;
+  opacity: 0;
+  animation: dmg-flash 0.4s ease-out forwards;
+}
+@keyframes dmg-flash {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---- Countdown ---- */
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  z-index: 40;
+}
+.countdown-num {
+  font-size: 120px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 60px rgba(217, 119, 6, 0.8);
+  animation: countPulse 1s ease-in-out;
+}
+@keyframes countPulse {
+  from { transform: scale(1.5); opacity: 0; }
+  50%  { transform: scale(1);   opacity: 1; }
+  to   { transform: scale(0.8); opacity: 0; }
+}
+
+/* ---- Interaction Prompt ---- */
+#interact-prompt {
+  position: absolute;
+  bottom: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: var(--clr-gold);
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+#interact-prompt.visible { opacity: 1; }
+
+/* ---- Common Dividers ---- */
+.divider-img {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  object-fit: contain;
+  opacity: 0.82;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 5px rgba(200,80,20,0.45));
+}
+.mission-divider       { display: flex; justify-content: center; margin: 6px 0 10px; }
+.mission-divider-small { display: flex; justify-content: center; margin: 3px 0; }
+.mission-divider-small .divider-img { max-width: 150px; opacity: 0.5; }
+
+/* ---- Hidden helpers ---- */
+.kb-hint,
+.health-bar-wrap,
+.crosshair { display: none !important; }
