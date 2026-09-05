@@ -51,30 +51,41 @@
   <!-- ===== PROFILE SETUP SCREEN ===== -->
   <div id="screen-profile" class="screen">
     <div class="menu-bg"></div>
-    <div class="section-panel section-panel-landscape">
-      <h2>إنشاء ملف تعريف</h2>
-      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+    <div class="mobile-screen-panel mobile-screen-panel--wide">
+      <div class="mobile-screen-header">
+        <div class="mobile-back-btn" style="visibility: hidden;"></div>
+        <h2 class="mobile-screen-title">إنشاء ملف تعريف</h2>
+        <div class="mobile-screen-title-spacer"></div>
+      </div>
 
-      <div class="profile-landscape-layout">
-        <div class="profile-preview-col">
-          <div class="gender-card active" id="card-hero" onclick="ProfileUI.selectGender('hero')">
-            <div class="gender-preview hero-bg" id="preview-hero">
-              <!-- 3D Canvas will be injected here -->
+      <div class="mobile-screen-body">
+        <div class="profile-setup-layout">
+          <!-- Left: Character Preview -->
+          <div class="profile-setup-preview">
+            <div class="gender-card active" id="card-hero" onclick="ProfileUI.selectGender('hero')">
+              <div class="gender-preview-box" id="preview-hero">
+                <!-- 3D Canvas injected here -->
+              </div>
+              <div class="gender-card-badge">المغامرة (الأساسية)</div>
             </div>
-            <span class="gender-name">المغامرة (الأساسية)</span>
-          </div>
-        </div>
-
-        <div class="profile-form-col">
-          <div class="input-group">
-            <label for="profile-name">اسم اللاعب</label>
-            <input type="text" id="profile-name" placeholder="أدخل اسمك هنا..." maxlength="15" autocomplete="off">
-            <span id="name-error" class="error-msg">الاسم يجب أن يكون حروف فقط (3-15 حرف)</span>
           </div>
 
-          <button id="btn-save-profile" class="btn-main btn-glow" onclick="ProfileUI.save()">
-            <span>بدء المغامرة ▶</span>
-          </button>
+          <!-- Right: Input Form -->
+          <div class="profile-setup-form">
+            <div class="setup-input-group">
+              <label class="setup-label">اسم اللاعب</label>
+              <input type="text" id="profile-name" class="setup-input" placeholder="أدخل اسمك هنا..." maxlength="15" autocomplete="off">
+              <div id="name-error" class="setup-error-msg">الاسم يجب أن يكون 3-15 حرفاً (حروف فقط)</div>
+            </div>
+
+            <div class="setup-info-box">
+              <p>مرحباً بك في المتاهة! اختر اسماً مميزاً لتبدأ رحلتك في البحث عن المخرج السحري.</p>
+            </div>
+
+            <button id="btn-save-profile" class="btn-setup-confirm" onclick="ProfileUI.save()">
+              <span>بدء المغامرة ▶</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
