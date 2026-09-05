@@ -597,29 +597,36 @@
   </div>
 
   <div id="screen-win" class="screen">
-    <div class="result-panel win">
-      <div class="result-icon">🎉</div>
-      <h2>أحسنت!</h2>
-      <div class="result-stats">
-        <div class="stat"><label>الوقت</label><span id="win-time">--:--</span></div>
-        <div class="stat"><label>النجوم</label><span id="win-stars">⭐⭐⭐</span></div>
-        <div class="stat"><label>المفاتيح</label><span id="win-keys">0/0</span></div>
-      </div>
-      <div class="result-buttons">
-        <button id="btn-next-level" class="btn-main btn-glow">المرحلة التالية ▶</button>
-        <button id="btn-win-menu" class="btn-main btn-secondary">القائمة الرئيسية</button>
+    <div class="screen-result">
+      <div class="pause-backdrop"></div>
+      <div class="result-panel win">
+        <div class="result-icon" style="font-size: 50px;">🎉</div>
+        <h2>أحسنت!</h2>
+        <div class="result-stats">
+          <div class="stat"><label>الوقت</label><span id="win-time">--:--</span></div>
+          <div class="stat"><label>النجوم</label><span id="win-stars">⭐⭐⭐</span></div>
+          <div class="stat"><label>المفاتيح</label><span id="win-keys">0/0</span></div>
+        </div>
+        <div class="result-buttons" style="display: flex; gap: 12px; width: 100%;">
+          <button id="btn-next-level" class="btn-main btn-glow">المرحلة التالية ▶</button>
+          <button id="btn-win-menu" class="btn-main btn-secondary">الرئيسية</button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- ===== LOSE SCREEN ===== -->
   <div id="screen-lose" class="screen">
-    <div class="result-panel lose">
-      <div class="result-icon">💀</div>
-      <h2>حاول مجدداً</h2>
-      <div class="result-buttons">
-        <button id="btn-retry" class="btn-main btn-glow">إعادة المحاولة 🔄</button>
-        <button id="btn-lose-menu" class="btn-main btn-secondary">القائمة الرئيسية</button>
+    <div class="screen-result">
+      <div class="pause-backdrop"></div>
+      <div class="result-panel lose">
+        <div class="result-icon" style="font-size: 50px;">💀</div>
+        <h2>حاول مجدداً</h2>
+        <p style="color: rgba(255,255,255,0.6); margin-top: -10px;">لا تيأس، المتاهة تتطلب الصبر...</p>
+        <div class="result-buttons" style="display: flex; gap: 12px; width: 100%;">
+          <button id="btn-retry" class="btn-main btn-glow">إعادة المحاولة 🔄</button>
+          <button id="btn-lose-menu" class="btn-main btn-secondary">الرئيسية</button>
+        </div>
       </div>
     </div>
   </div>
