@@ -44,9 +44,13 @@ async function loadScript(src) {
 
 // Load all game scripts in correct order
 const scripts = [
-  // Core
+  // Core Systems
   'src/core/Engine.js',
   'src/core/AssetLoader.js',
+  'src/core/AudioManager.js',
+  'ui/scripts/UI.js',
+
+  // Game Logic
   'src/core/SceneManager.js',
   'src/core/LightSystem.js',
   'src/core/atmosphere/AtmosphereData.js',
@@ -54,7 +58,6 @@ const scripts = [
   'src/core/atmosphere/LensFlareManager.js',
   'src/core/AtmosphereSystem.js',
   'src/core/InputManager.js',
-  'src/core/AudioManager.js',
   'src/core/WeatherSystem.js',
   // Maze
   'src/maze/MazeGenerator.js',
@@ -73,13 +76,12 @@ const scripts = [
   // Levels
   'levels/LevelManager.js',
   'levels/AutoLevelLoader.js',
-  'levels/Level1.js', // Updated from مراحل/Level1.js for better URL support
+  'levels/Level1.js',
   // UI
   'ui/scripts/Settings.js',
   'ui/scripts/HUD.js',
   'ui/scripts/Minimap.js',
   'ui/scripts/Joystick.js',
-  'ui/scripts/UI.js',
   'ui/scripts/ProfileUI.js',
   // Telegram
   'src/telegram/TelegramAPI.js',
@@ -87,38 +89,85 @@ const scripts = [
   'src/Game.js',
 ];
 
-const totalScripts = scripts.length;
-let loadedCount = 0;
+// Heavy Global Assets to ensure "Real Data" progress
+const globalAssets = [
+  { type: 'texture', url: 'assets/ui/menu_bg.png', key: 'menu_bg' },
+  { type: 'texture', url: 'assets/ui/hud_widget_bg.png', key: 'hud_widget_bg' },
+  { type: 'audio',   url: 'assets/sounds/menu_theme.mp3', key: 'menu_theme' },
+  { type: 'texture', url: 'assets/ui/icons/circular icon for downloading.png', key: 'loading_icon' },
+  { type: 'texture', url: 'assets/ui/icons/btn_play.png', key: 'btn_play' }
+];
 
-function updateInitialProgress() {
-  loadedCount++;
-  const pct = (loadedCount / totalScripts) * 100;
+async function startLoading() {
+  const totalSteps = scripts.length + globalAssets.length;
+  let currentStep = 0;
 
-  // Use a minimal style-safe approach since UI.js might not be loaded yet
-  const bar = document.getElementById('loading-bar');
-  if (bar) bar.style.width = pct + '%';
-  const pEl = document.getElementById('loading-percentage');
-  if (pEl) pEl.textContent = Math.round(pct) + '%';
+  // 1. Load Essential Loader Scripts first
+  const coreCount = 4; // Engine, AssetLoader, AudioManager, UI
+  for (let i = 0; i < coreCount; i++) {
+    await loadScript(scripts[i]);
+    currentStep++;
+    updateLoadingUI((currentStep / totalSteps) * 100, `جاري تشغيل النظام... (${currentStep}/${totalSteps})`);
+  }
 
-  const textEl = document.getElementById('loading-text');
-  if (textEl) textEl.textContent = `جاري تحميل النظام... (${loadedCount}/${totalScripts})`;
-}
+  // 2. Now that AssetLoader is ready, load Heavy Assets with real progress
+  if (window.AssetLoader) {
+    AssetLoader.onProgress((assetPct, bytes) => {
+      const basePct = (coreCount / totalSteps) * 100;
+      const assetContribution = (globalAssets.length / totalSteps) * assetPct;
 
-for (const src of scripts) {
-  try {
-    await loadScript(src);
-    updateInitialProgress();
-  } catch(e) {
-    console.error('[main] Failed to load:', src, e);
+      let sizeInfo = "";
+      if (bytes && bytes.total > 0) {
+        const loadedMB = (bytes.loaded / 1024 / 1024).toFixed(2);
+        const totalMB = (bytes.total / 1024 / 1024).toFixed(2);
+        sizeInfo = `${loadedMB} MB / ${totalMB} MB`;
+      }
+
+      updateLoadingUI(basePct + assetContribution, `جاري تحميل موارد اللعبة... ${Math.round(assetPct)}%`, sizeInfo);
+    });
+
+    await AssetLoader.loadAll(globalAssets, true);
+  }
+
+  // 3. Load remaining scripts
+  currentStep = coreCount + globalAssets.length;
+  for (let i = coreCount; i < scripts.length; i++) {
+    await loadScript(scripts[i]);
+    currentStep++;
+    const pct = (currentStep / totalSteps) * 100;
+    updateLoadingUI(pct, `جاري تهيئة المكونات... (${i + 1}/${scripts.length})`);
+  }
+
+  // Finalize
+  updateLoadingUI(100, 'جاهز للمغامرة!');
+
+  if (window.UI) {
+    setTimeout(() => {
+      if (UI.getCurrent() === 'loading') {
+         UI.showScreen('menu');
+      }
+    }, 800);
   }
 }
 
-// After all scripts load, the Game.js logic will eventually show the menu.
-// Let's ensure a smooth transition from Splash to Menu
-if (window.UI) {
-  setTimeout(() => {
-    if (UI.getCurrent() === 'loading') {
-       UI.showScreen('menu');
-    }
-  }, 500);
+function updateLoadingUI(pct, text, sizeInfo = "") {
+  const bar = document.getElementById('loading-bar');
+  const pEl = document.getElementById('loading-percentage');
+  const tEl = document.getElementById('loading-text');
+  const sEl = document.getElementById('loading-size');
+
+  if (bar) bar.style.width = pct + '%';
+  if (pEl) pEl.textContent = Math.round(pct) + '%';
+  if (tEl) tEl.textContent = text;
+  if (sEl) sEl.textContent = sizeInfo;
 }
+
+// Start the sequence
+startLoading();
+
+// Removed the old simple loop
+/*
+const totalScripts = scripts.length;
+let loadedCount = 0;
+...
+*/
