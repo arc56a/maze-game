@@ -59,6 +59,16 @@ const AudioManager = (() => {
   async function load(key, url) {
     if (!ctx) return;
     if (buffers[key]) return buffers[key];
+
+    // Check if AssetLoader already has this buffer (cached as global)
+    if (window.AssetLoader && AssetLoader.get(url)) {
+      const cached = AssetLoader.get(url);
+      if (cached instanceof ArrayBuffer) {
+        buffers[key] = await ctx.decodeAudioData(cached.slice(0));
+        return buffers[key];
+      }
+    }
+
     if (audioLoadingPromises[key]) return audioLoadingPromises[key];
 
     audioLoadingPromises[key] = (async () => {

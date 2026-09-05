@@ -172,6 +172,8 @@ const UI = (() => {
   function setLoadingProgress(progress) {
     const el = document.getElementById('loading-bar');
     if (el) el.style.width = `${progress}%`;
+    const pEl = document.getElementById('loading-percentage');
+    if (pEl) pEl.textContent = `${Math.round(progress)}%`;
   }
 
   const tips = [

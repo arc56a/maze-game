@@ -34,7 +34,7 @@
   document.getElementById('btn-play')?.addEventListener('click', () => {
     const first = getFirstLevelIndex();
     if (first === null) {
-      UI.toast('لا توجد مراحل مضافة بعد. ضع ملف stage.js داخل مجلد مراحل أو لفل', 'info');
+      UI.toast('لا توجد مراحل مضافة بعد. ضع ملف المستوى داخل مجلد levels', 'info');
       return;
     }
     if (window.UI && typeof UI.requestFullscreenAndLandscape === 'function') {

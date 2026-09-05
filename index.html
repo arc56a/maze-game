@@ -51,30 +51,41 @@
   <!-- ===== PROFILE SETUP SCREEN ===== -->
   <div id="screen-profile" class="screen">
     <div class="menu-bg"></div>
-    <div class="section-panel section-panel-landscape">
-      <h2>إنشاء ملف تعريف</h2>
-      <div class="mission-divider"><img src="assets/ui/divider_large.png" alt="" class="divider-img" /></div>
+    <div class="mobile-screen-panel mobile-screen-panel--wide">
+      <div class="mobile-screen-header">
+        <div class="mobile-back-btn" style="visibility: hidden;"></div>
+        <h2 class="mobile-screen-title">إنشاء ملف تعريف</h2>
+        <div class="mobile-screen-title-spacer"></div>
+      </div>
 
-      <div class="profile-landscape-layout">
-        <div class="profile-preview-col">
-          <div class="gender-card active" id="card-hero" onclick="ProfileUI.selectGender('hero')">
-            <div class="gender-preview hero-bg" id="preview-hero">
-              <!-- 3D Canvas will be injected here -->
+      <div class="mobile-screen-body">
+        <div class="profile-setup-layout">
+          <!-- Left: Character Preview -->
+          <div class="profile-setup-preview">
+            <div class="gender-card active" id="card-hero" onclick="ProfileUI.selectGender('hero')">
+              <div class="gender-preview-box" id="preview-hero">
+                <!-- 3D Canvas injected here -->
+              </div>
+              <div class="gender-card-badge">المغامرة (الأساسية)</div>
             </div>
-            <span class="gender-name">المغامرة (الأساسية)</span>
-          </div>
-        </div>
-
-        <div class="profile-form-col">
-          <div class="input-group">
-            <label for="profile-name">اسم اللاعب</label>
-            <input type="text" id="profile-name" placeholder="أدخل اسمك هنا..." maxlength="15" autocomplete="off">
-            <span id="name-error" class="error-msg">الاسم يجب أن يكون حروف فقط (3-15 حرف)</span>
           </div>
 
-          <button id="btn-save-profile" class="btn-main btn-glow" onclick="ProfileUI.save()">
-            <span>بدء المغامرة ▶</span>
-          </button>
+          <!-- Right: Input Form -->
+          <div class="profile-setup-form">
+            <div class="setup-input-group">
+              <label class="setup-label">اسم اللاعب</label>
+              <input type="text" id="profile-name" class="setup-input" placeholder="أدخل اسمك هنا..." maxlength="15" autocomplete="off">
+              <div id="name-error" class="setup-error-msg">الاسم يجب أن يكون 3-15 حرفاً (حروف فقط)</div>
+            </div>
+
+            <div class="setup-info-box">
+              <p>مرحباً بك في المتاهة! اختر اسماً مميزاً لتبدأ رحلتك في البحث عن المخرج السحري.</p>
+            </div>
+
+            <button id="btn-save-profile" class="btn-setup-confirm" onclick="ProfileUI.save()">
+              <span>بدء المغامرة ▶</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -133,13 +144,13 @@
 
   <!-- ===== SETTINGS SCREEN ===== -->
   <div id="screen-settings" class="screen">
-    <div class="menu-bg"></div>
+    <div class="pause-backdrop"></div>
     <div class="mobile-screen-panel mobile-screen-panel--wide">
       <div class="mobile-screen-header">
         <button class="mobile-back-btn" onclick="UI.goBack()" title="رجوع">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <h2 class="mobile-screen-title">الإعدادات</h2>
+        <h2 class="mobile-screen-title">إعدادات اللعبة</h2>
         <div class="mobile-screen-title-spacer"></div>
       </div>
       <div class="settings-landscape-layout">
@@ -362,7 +373,7 @@
       <div class="about-mobile-layout">
         <div class="about-logo-col">
           <div class="about-icon">
-            <img src="assets/ui/icons/circular icon for downloading.png" alt="Logo" class="about-icon-img" />
+            <img src="assets/ui/icons/loading_icon.png" alt="Logo" class="about-icon-img" />
           </div>
           <h3 class="about-game-title">MAZE OF DARKNESS</h3>
           <span class="about-version">v1.0</span>
@@ -586,54 +597,65 @@
   </div>
 
   <div id="screen-win" class="screen">
-    <div class="result-panel win">
-      <div class="result-icon">🎉</div>
-      <h2>أحسنت!</h2>
-      <div class="result-stats">
-        <div class="stat"><label>الوقت</label><span id="win-time">--:--</span></div>
-        <div class="stat"><label>النجوم</label><span id="win-stars">⭐⭐⭐</span></div>
-        <div class="stat"><label>المفاتيح</label><span id="win-keys">0/0</span></div>
-      </div>
-      <div class="result-buttons">
-        <button id="btn-next-level" class="btn-main btn-glow">المرحلة التالية ▶</button>
-        <button id="btn-win-menu" class="btn-main btn-secondary">القائمة الرئيسية</button>
+    <div class="screen-result">
+      <div class="pause-backdrop"></div>
+      <div class="result-panel win">
+        <div class="result-icon" style="font-size: 50px;">🎉</div>
+        <h2>أحسنت!</h2>
+        <div class="result-stats">
+          <div class="stat"><label>الوقت</label><span id="win-time">--:--</span></div>
+          <div class="stat"><label>النجوم</label><span id="win-stars">⭐⭐⭐</span></div>
+          <div class="stat"><label>المفاتيح</label><span id="win-keys">0/0</span></div>
+        </div>
+        <div class="result-buttons" style="display: flex; gap: 12px; width: 100%;">
+          <button id="btn-next-level" class="btn-main btn-glow">المرحلة التالية ▶</button>
+          <button id="btn-win-menu" class="btn-main btn-secondary">الرئيسية</button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- ===== LOSE SCREEN ===== -->
   <div id="screen-lose" class="screen">
-    <div class="result-panel lose">
-      <div class="result-icon">💀</div>
-      <h2>حاول مجدداً</h2>
-      <div class="result-buttons">
-        <button id="btn-retry" class="btn-main btn-glow">إعادة المحاولة 🔄</button>
-        <button id="btn-lose-menu" class="btn-main btn-secondary">القائمة الرئيسية</button>
+    <div class="screen-result">
+      <div class="pause-backdrop"></div>
+      <div class="result-panel lose">
+        <div class="result-icon" style="font-size: 50px;">💀</div>
+        <h2>حاول مجدداً</h2>
+        <p style="color: rgba(255,255,255,0.6); margin-top: -10px;">لا تيأس، المتاهة تتطلب الصبر...</p>
+        <div class="result-buttons" style="display: flex; gap: 12px; width: 100%;">
+          <button id="btn-retry" class="btn-main btn-glow">إعادة المحاولة 🔄</button>
+          <button id="btn-lose-menu" class="btn-main btn-secondary">الرئيسية</button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- ===== LOADING SCREEN ===== -->
-  <div id="screen-loading" class="screen">
+  <div id="screen-loading" class="screen active">
     <div class="loading-bg-blur"></div>
     <div class="loading-content">
       <div class="loading-logo-wrap">
         <div class="loading-spinner-ring"></div>
         <div class="loading-icon-inner">
-          <img src="assets/ui/icons/circular icon for downloading.png" alt="تحميل" class="loading-icon-img" />
+          <img src="assets/ui/icons/loading_icon.png" alt="تحميل" class="loading-icon-img" />
         </div>
       </div>
 
       <div class="loading-info">
-        <p id="loading-text">جاري تهيئة المرحلة...</p>
+        <p id="loading-text">جاري بدء اللعبة...</p>
         <div class="loading-bar-wrap">
           <div class="loading-bar" id="loading-bar"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 5px; color: #fbbf24; font-size: 13px; font-weight: 900; font-family: monospace;">
+          <div id="loading-size">0 KB / 0 KB</div>
+          <div id="loading-percentage">0%</div>
         </div>
       </div>
 
       <div class="loading-tip-box">
-        <span class="loading-tip-label">نصيحة سريعة</span>
-        <p id="loading-tip-text">اجمع كل المفاتيح لفتح بوابة الخروج السحرية!</p>
+        <span class="loading-tip-label">جاري التحميل</span>
+        <p id="loading-tip-text">يرجى الانتظار بينما نقوم بتهيئة عالم المتاهة...</p>
       </div>
     </div>
   </div>

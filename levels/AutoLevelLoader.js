@@ -2,7 +2,7 @@
   if (typeof window === 'undefined') return;
 
   const BASE_DIRS = [
-    'مراحل/'
+    'levels/'
   ];
 
   const AUTO_DIRS = [...new Set([
@@ -69,7 +69,7 @@
   }
 
   const DEFAULT_LEVEL_FILES = [
-    'مراحل/Level1.js'
+    'levels/Level1.js'
   ];
 
   async function scanAndRegister() {
@@ -84,7 +84,7 @@
         if (!file.endsWith('.js')) continue;
         if (IGNORED.has(name)) continue;
         if (name === 'LevelManager.js' || name === 'AutoLevelLoader.js') continue;
-        if (!file.startsWith('مراحل/')) continue;
+        if (!file.startsWith('levels/')) continue;
         found.add(file);
       }
     }
@@ -94,7 +94,7 @@
     for (const file of customFiles) {
       if (!file.endsWith('.js')) continue;
       const name = file.split('/').pop().split('?')[0].split('#')[0];
-      if (!IGNORED.has(name) && file.startsWith('مراحل/')) found.add(file);
+      if (!IGNORED.has(name) && file.startsWith('levels/')) found.add(file);
     }
 
     // 3. Always include default known levels if none or as baseline
