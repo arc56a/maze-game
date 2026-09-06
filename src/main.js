@@ -45,6 +45,7 @@ async function loadScript(src) {
 // Load all game scripts in correct order
 const scripts = [
   // Core Systems
+  'src/core/CacheManager.js',
   'src/core/Engine.js',
   'src/core/AssetLoader.js',
   'src/core/AudioManager.js',

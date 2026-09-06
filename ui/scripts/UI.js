@@ -32,6 +32,11 @@ const UI = (() => {
     }
     if (name === 'account') ProfileUI.updateAccountScreen();
     if (name === 'char-select') ProfileUI.updateCharSelectScreen();
+    if (name === 'menu') {
+      _setupMenuAnim();
+      updateMenuPlayerMini();
+      _wireUpdateBtn();
+    }
 
     // ─── Menu Audio Control ───
     _updateMenuAudio(name);
@@ -143,6 +148,25 @@ const UI = (() => {
     }
   }
 
+  function _wireUpdateBtn() {
+    const btn = document.getElementById('btn-update');
+    if (btn) {
+      btn.onclick = () => showScreen('update');
+    }
+  }
+
+  async function triggerUpdate(type) {
+    if (confirm('هل أنت متأكد؟ سيتم إعادة تحميل اللعبة وتحديث البيانات.')) {
+      toast('جاري تحديث البيانات... يرجى الانتظار', 'info');
+      if (window.CacheManager) {
+        await CacheManager.clearCache(type);
+      }
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
+  }
+
   // ─── Toast ────────────────────────────────────────────────
   function toast(message, type = 'info', duration = 3000) {
     console.log(`[UI] Toast Triggered: ${message} (${type})`);
@@ -207,5 +231,6 @@ const UI = (() => {
     requestFullscreenAndLandscape,
     toggleFullscreen,
     updateMenuPlayerMini,
+    triggerUpdate,
   };
 })();

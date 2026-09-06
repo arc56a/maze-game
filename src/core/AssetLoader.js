@@ -55,40 +55,50 @@ const AssetLoader = (() => {
     jobProgress[url] = 0;
     jobBytes[url] = { loaded: 0, total: 0 };
 
-    const p = new Promise((resolve, reject) => {
-      _getGLTF().load(
-        url,
-        gltf => {
-          cache[url] = finalizeAsset(gltf);
-          delete pendingPromises[url];
-          jobProgress[url] = 1;
-          // Note: total might not be known until finished if not provided by server
-          if (jobBytes[url].total === 0) jobBytes[url].total = jobBytes[url].loaded;
-          _tick();
-          resolve(cache[url]);
-        },
-        xhr  => {
-          if (xhr.total > 0) {
-            jobProgress[url] = xhr.loaded / xhr.total;
-            jobBytes[url].loaded = xhr.loaded;
-            jobBytes[url].total = xhr.total;
+    const p = (async () => {
+      try {
+        // 1. Try Cache First
+        if (window.CacheManager) {
+          const cached = await CacheManager.getAsset(url);
+          if (cached) {
+            console.log(`[AssetLoader] Loaded from cache: ${url}`);
+            const blobUrl = URL.createObjectURL(cached);
+            const gltf = await new Promise((res, rej) => {
+              _getGLTF().load(blobUrl, res, undefined, rej);
+            });
+            URL.revokeObjectURL(blobUrl);
+            cache[url] = finalizeAsset(gltf);
+            jobProgress[url] = 1;
             _tick();
-          } else {
-            // Fallback if total is unknown
-            jobBytes[url].loaded = xhr.loaded;
+            delete pendingPromises[url];
+            return cache[url];
           }
-        },
-        err  => {
-          const logUrl = (typeof url === 'string' && url.startsWith('data:')) ? url.substring(0, 32) + '...' : url;
-          console.error('[AssetLoader] GLTF error:', logUrl, err);
-          delete pendingPromises[url];
-          delete jobProgress[url];
-          delete jobBytes[url];
-          _tick();
-          reject(err);
         }
-      );
-    });
+
+        // 2. Fetch and Save
+        const response = await fetch(url);
+        const blob = await response.blob();
+        if (window.CacheManager) await CacheManager.saveAsset(url, blob);
+
+        const blobUrl = URL.createObjectURL(blob);
+        const gltf = await new Promise((res, rej) => {
+          _getGLTF().load(blobUrl, res, undefined, rej);
+        });
+        URL.revokeObjectURL(blobUrl);
+
+        cache[url] = finalizeAsset(gltf);
+        jobProgress[url] = 1;
+        _tick();
+        delete pendingPromises[url];
+        return cache[url];
+      } catch (err) {
+        console.error('[AssetLoader] GLTF error:', url, err);
+        delete pendingPromises[url];
+        _tick();
+        throw err;
+      }
+    })();
+
     pendingPromises[url] = p;
     return p;
   }
@@ -104,43 +114,54 @@ const AssetLoader = (() => {
     jobProgress[url] = 0;
     jobBytes[url] = { loaded: 0, total: 0 };
 
-    const p = new Promise((resolve, reject) => {
-      textureLoader.load(
-        url,
-        tex => {
-          tex.colorSpace = THREE.SRGBColorSpace;
-          // Performance & Beauty: Anisotropy makes textures much sharper at glancing angles
-          if (renderer) {
-            tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
-          }
-          cache[url] = tex;
-          delete pendingPromises[url];
-          jobProgress[url] = 1;
-          if (jobBytes[url].total === 0) jobBytes[url].total = jobBytes[url].loaded;
-          _tick();
-          resolve(tex);
-        },
-        xhr => {
-          if (xhr && xhr.total > 0) {
-            jobProgress[url] = xhr.loaded / xhr.total;
-            jobBytes[url].loaded = xhr.loaded;
-            jobBytes[url].total = xhr.total;
+    const p = (async () => {
+      try {
+        // 1. Try Cache
+        if (window.CacheManager) {
+          const cached = await CacheManager.getAsset(url);
+          if (cached) {
+            const blobUrl = URL.createObjectURL(cached);
+            const tex = await new Promise((res, rej) => {
+              textureLoader.load(blobUrl, res, undefined, rej);
+            });
+            URL.revokeObjectURL(blobUrl);
+            const renderer = window.Engine ? Engine.getRenderer() : null;
+            if (renderer) tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+            cache[url] = tex;
+            jobProgress[url] = 1;
             _tick();
-          } else if (xhr) {
-            jobBytes[url].loaded = xhr.loaded;
+            delete pendingPromises[url];
+            return tex;
           }
-        },
-        err => {
-          const logUrl = (typeof url === 'string' && url.startsWith('data:')) ? url.substring(0, 32) + '...' : url;
-          console.error('[AssetLoader] Texture error:', logUrl, err);
-          delete pendingPromises[url];
-          delete jobProgress[url];
-          delete jobBytes[url];
-          _tick();
-          reject(err);
         }
-      );
-    });
+
+        // 2. Network
+        const response = await fetch(url);
+        const blob = await response.blob();
+        if (window.CacheManager) await CacheManager.saveAsset(url, blob);
+
+        const blobUrl = URL.createObjectURL(blob);
+        const tex = await new Promise((res, rej) => {
+          textureLoader.load(blobUrl, res, undefined, rej);
+        });
+        URL.revokeObjectURL(blobUrl);
+
+        tex.colorSpace = THREE.SRGBColorSpace;
+        const renderer = window.Engine ? Engine.getRenderer() : null;
+        if (renderer) tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+        cache[url] = tex;
+        jobProgress[url] = 1;
+        _tick();
+        delete pendingPromises[url];
+        return tex;
+      } catch (err) {
+        console.error('[AssetLoader] Texture error:', url, err);
+        delete pendingPromises[url];
+        _tick();
+        throw err;
+      }
+    })();
+
     pendingPromises[url] = p;
     return p;
   }
@@ -156,45 +177,35 @@ const AssetLoader = (() => {
     jobProgress[url] = 0;
     jobBytes[url] = { loaded: 0, total: 0 };
 
-    const p = new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-      xhr.responseType = 'arraybuffer';
-
-      xhr.onprogress = (event) => {
-        if (event.lengthComputable) {
-          jobProgress[url] = event.loaded / event.total;
-          jobBytes[url].loaded = event.loaded;
-          jobBytes[url].total = event.total;
-          _tick();
-        } else {
-          jobBytes[url].loaded = event.loaded;
+    const p = (async () => {
+      try {
+        if (window.CacheManager) {
+          const cached = await CacheManager.getAsset(url);
+          if (cached) {
+            cache[url] = cached;
+            jobProgress[url] = 1;
+            _tick();
+            delete pendingPromises[url];
+            return cached;
+          }
         }
-      };
 
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          cache[url] = xhr.response;
-          jobProgress[url] = 1;
-          jobBytes[url].loaded = xhr.response.byteLength;
-          jobBytes[url].total = xhr.response.byteLength;
-          delete pendingPromises[url];
-          _tick();
-          resolve(xhr.response);
-        } else {
-          reject(new Error(`Audio load failed: ${xhr.status}`));
-        }
-      };
+        const response = await fetch(url);
+        const buffer = await response.arrayBuffer();
+        if (window.CacheManager) await CacheManager.saveAsset(url, buffer);
 
-      xhr.onerror = () => {
-        delete pendingPromises[url];
-        delete jobProgress[url];
+        cache[url] = buffer;
+        jobProgress[url] = 1;
         _tick();
-        reject(new Error('Audio network error'));
-      };
-
-      xhr.send();
-    });
+        delete pendingPromises[url];
+        return buffer;
+      } catch (err) {
+        console.error('[AssetLoader] Audio error:', url, err);
+        delete pendingPromises[url];
+        _tick();
+        throw err;
+      }
+    })();
 
     pendingPromises[url] = p;
     return p;

@@ -870,3 +870,36 @@
   .about-icon { width: 50px; height: 50px; }
   .levels-grid-mobile { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 8px; }
 }
+
+/* =============================================
+   UPDATE SCREEN STYLES
+   ============================================= */
+.update-options-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 10px;
+  text-align: center;
+}
+
+.update-info-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.update-btns-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.update-btns-grid .btn-main {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+}
