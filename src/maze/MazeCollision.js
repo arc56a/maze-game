@@ -235,9 +235,25 @@ const MazeCollision = (() => {
     }
 
     const C = _getC();
-    // Use the actual door marker position (offset from cell edge)
-    const doorX = (exitColOrObj + 1) * C - 1.2;
-    const doorZ = exitRow * C + C / 2;
+
+    // --- Precise Door Logic for auto-generated mazes ---
+    // The door is usually placed on the right-most (East) or bottom-most (South) wall
+    // in the last cell of the maze.
+    const isLastCol = (exitColOrObj === _cols - 1);
+    const isLastRow = (exitRow === _rows - 1);
+
+    let doorX, doorZ;
+
+    if (isLastCol) {
+      doorX = (exitColOrObj + 1) * C - 0.45; // Snapped to East Wall
+      doorZ = exitRow * C + C / 2;
+    } else if (isLastRow) {
+      doorX = exitColOrObj * C + C / 2;
+      doorZ = (exitRow + 1) * C - 0.45; // Snapped to South Wall
+    } else {
+      doorX = exitColOrObj * C + C / 2;
+      doorZ = exitRow * C + C / 2;
+    }
 
     const dx = position.x - doorX;
     const dz = position.z - doorZ;
