@@ -92,9 +92,9 @@ const AtmosphereSystem = (() => {
     _raycastAccum += delta;
     const mazeObj = _scene ? _scene.getObjectByName('Maze') : null;
 
-    // Performance Optimization: Throttle raycasting more on mobile instead of skipping it
+    // Performance Optimization: Throttle raycasting more on mobile
     const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    const customInterval = isMobile ? (1 / 6) : RAYCAST_INTERVAL; // 6Hz on mobile vs 12Hz desktop
+    const customInterval = isMobile ? 1.0 : RAYCAST_INTERVAL; // 1 second on mobile vs 0.08s desktop
 
     if (mazeObj && _raycastAccum >= customInterval) {
       _raycastAccum = 0;

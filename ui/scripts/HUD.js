@@ -11,9 +11,12 @@ const HUD = (() => {
     document.getElementById('hud-level-num').textContent = n;
   }
 
-  // ─── Timer ────────────────────────────────────────────────
+  let _lastTimerVal = -1;
   function setTimer(seconds) {
-    document.getElementById('hud-time').textContent = formatTime(seconds);
+    const sec = Math.floor(seconds);
+    if (sec === _lastTimerVal) return;
+    _lastTimerVal = sec;
+    document.getElementById('hud-time').textContent = formatTime(sec);
   }
 
   function formatTime(seconds) {

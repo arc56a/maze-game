@@ -251,11 +251,25 @@ const WeatherSystem = (() => {
     console.log(`[WeatherSystem] Rain toggled: ${rainActive}`);
   }
 
-  // ─── Update Dynamic Timeline & Clock ──────────────────────
+  let _timelineAccum = 0;
+  const TIMELINE_INTERVAL = 1.0; // Update time/UI once per second to save CPU
+
   function _updateWeatherTimeline(delta, playerPos) {
     levelElapsed += delta;
+    _timelineAccum += delta;
 
-    // 1. Dynamic rain & storm cycling (Only if rain is active)
+    if (_timelineAccum < TIMELINE_INTERVAL) {
+       // Still update celestial hour but don't do UI math/DOM yet
+       if (typeof AtmosphereSystem !== 'undefined') {
+         const gameHour = startHour + (levelElapsed * timeSpeed);
+         const gameHourFloat = timeLoop ? ((gameHour % 24) + 24) % 24 : Math.min(Math.max(gameHour, 0), 23.9999);
+         AtmosphereSystem.setHour(gameHourFloat, delta, playerPos);
+       }
+       return;
+    }
+    _timelineAccum = 0;
+
+    // 1. Dynamic rain & storm cycling
     let weatherIcon = '☀️';
     let weatherLabel = 'نهار مشرق';
 
@@ -317,15 +331,24 @@ const WeatherSystem = (() => {
     }
   }
 
+  let _rainFrameSkip = 0;
+
   // ─── Update Loop ─────────────────────────────────────────
   function update(delta, playerPos) {
     if (!rainGroup) return;
 
     const centerPos = playerPos || { x: 0, y: 0, z: 0 };
-
     _updateWeatherTimeline(delta, centerPos);
 
-    // 1. Update Rain Particles (Continuous uniform distribution without waves or bursts)
+    // Skip rain physics every other frame on mobile to save 50% CPU
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    if (isMobile) {
+      _rainFrameSkip++;
+      if (_rainFrameSkip % 2 === 0) return;
+      delta *= 2; // Compensate for skipped frame
+    }
+
+    // 1. Update Rain Particles
     if (rainActive && rainPositions && (currentWeather === 'rain' || currentWeather === 'storm' || currentWeather === 'rain_snow')) {
       rainGroup.position.set(centerPos.x, 0, centerPos.z);
 
