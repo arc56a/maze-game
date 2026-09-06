@@ -19,33 +19,25 @@ const AssetLoader = (() => {
   }
 
   // ─── Load GLTF / GLB ─────────────────────────────────────
-  function _normalizeShadowState(root) {
+  function _normalizeState(root) {
     if (!root) return;
     root.traverse(obj => {
-      if (obj.isMesh) {
-        obj.castShadow = true;
-        obj.receiveShadow = true;
-        if (obj.material) {
-          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-          mats.forEach(m => {
-            if (m) {
-              m.side = THREE.DoubleSide;
-              m.shadowSide = THREE.DoubleSide;
-              m.needsUpdate = true;
-            }
-          });
-        }
-      }
-      if (obj.isLight) {
-        obj.castShadow = true;
+      if (obj.isMesh && obj.material) {
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        mats.forEach(m => {
+          if (m) {
+            m.side = THREE.DoubleSide;
+            m.needsUpdate = true;
+          }
+        });
       }
     });
   }
 
   function finalizeAsset(asset) {
     if (!asset) return asset;
-    if (asset.scene) _normalizeShadowState(asset.scene);
-    if (Array.isArray(asset.scenes)) asset.scenes.forEach(scene => _normalizeShadowState(scene));
+    if (asset.scene) _normalizeState(asset.scene);
+    if (Array.isArray(asset.scenes)) asset.scenes.forEach(scene => _normalizeState(scene));
     return asset;
   }
 
@@ -117,6 +109,10 @@ const AssetLoader = (() => {
         url,
         tex => {
           tex.colorSpace = THREE.SRGBColorSpace;
+          // Performance & Beauty: Anisotropy makes textures much sharper at glancing angles
+          if (renderer) {
+            tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+          }
           cache[url] = tex;
           delete pendingPromises[url];
           jobProgress[url] = 1;

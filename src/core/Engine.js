@@ -18,20 +18,18 @@ const Engine = (() => {
     // Renderer
     renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: false, // Turned off by default for mobile performance
+      antialias: true, // Re-enabled for beauty since shadows are gone
       powerPreference: 'high-performance',
-      precision: 'mediump' // Standard for mobile to save GPU power
+      precision: 'highp' // Increased precision for better visual quality
     });
 
-    // Smart DPR Capping: 1.5 is a sweet spot for mobile clarity vs heat.
+    // Smart DPR Capping: 2.0 is perfect for beauty on high-res mobile screens.
     const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    const dpr = isMobile ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio || 1, 2.0);
+    const dpr = isMobile ? Math.min(window.devicePixelRatio, 2.0) : Math.min(window.devicePixelRatio || 1, 2.0);
 
     renderer.setPixelRatio(dpr);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = false; // Shadows disabled for performance and visual clarity
-    renderer.shadowMap.type = THREE.BasicShadowMap;
-    renderer.shadowMap.autoUpdate = true;
+    renderer.shadowMap.enabled = false; // Permanently off for performance
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
