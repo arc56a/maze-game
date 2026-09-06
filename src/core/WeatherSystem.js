@@ -14,7 +14,9 @@ const WeatherSystem = (() => {
   let snowGroup       = null;
   let snowGeometry    = null;
   let snowPositions   = null;
-  let rainCount       = 3500;
+  // Performance optimization: Reduce particle count for mobile devices
+  const isMobile      = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  let rainCount       = isMobile ? 800 : 3500;
   let rainActive      = false;
 
   let lightningLight  = null;

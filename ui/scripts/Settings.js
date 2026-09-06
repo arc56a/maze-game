@@ -5,23 +5,25 @@
 const Settings = (() => {
   const STORAGE_KEY = 'maze3d_settings';
 
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth < 768;
+
   const defaults = {
     language: 'ar',
-    cameraMode: 'third',   // 'first' | 'third'
+    cameraMode: 'third',
     mobileFullscreen: true,
     autoLandscape: true,
     sfx: true,
     music: true,
-    quality: 'medium',  // 'low' | 'medium' | 'high'
+    quality: isMobile ? 'low' : 'medium',  // Smart default
     sensitivity: 1.0,
     haptic: true,
-    antialiasing: true,
-    shadows: true,
+    antialiasing: !isMobile,               // AA is heavy on mobile
+    shadows: !isMobile,                    // Shadows are the main heat source
     volMenu: 0.5,
     volGame: 0.4,
     volRain: 0.5,
     volThunder: 0.8,
-    grass: true,
+    grass: !isMobile,                      // Grass needs many draw calls
     rain: true
   };
 
