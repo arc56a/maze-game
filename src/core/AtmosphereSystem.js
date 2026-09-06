@@ -88,6 +88,10 @@ const AtmosphereSystem = (() => {
     const sp = AtmosphereData.getCelestialPos(h, 6, _smoothPlayerPos);
     const mp = AtmosphereData.getCelestialPos(h, 18, _smoothPlayerPos);
 
+    // ─── Wall & Ceiling Line-Of-Sight Occlusion (Throttled) ───
+    _raycastAccum += delta;
+    const mazeObj = _scene ? _scene.getObjectByName('Maze') : null;
+
     // Performance Optimization: Throttle raycasting more on mobile instead of skipping it
     const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     const customInterval = isMobile ? (1 / 6) : RAYCAST_INTERVAL; // 6Hz on mobile vs 12Hz desktop
