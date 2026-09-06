@@ -151,18 +151,18 @@ const UI = (() => {
   function _wireUpdateBtn() {
     const btn = document.getElementById('btn-update');
     if (btn) {
-      btn.onclick = () => showScreen('update');
+      btn.onclick = () => triggerUpdate('all');
     }
   }
 
   async function triggerUpdate(type) {
-    if (confirm('هل أنت متأكد؟ سيتم إعادة تحميل اللعبة وتحديث البيانات.')) {
+    if (confirm('هل تود التحقق من وجود تحديثات جديدة وتحميلها؟')) {
       toast('جاري تحديث البيانات... يرجى الانتظار', 'info');
       if (window.CacheManager) {
-        await CacheManager.clearCache(type);
+        await CacheManager.clearCache('all');
       }
       setTimeout(() => {
-        window.location.reload();
+        window.location.reload(true); // Force reload from server
       }, 1000);
     }
   }
