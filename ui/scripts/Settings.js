@@ -14,16 +14,16 @@ const Settings = (() => {
     autoLandscape: true,
     sfx: true,
     music: true,
-    quality: isMobile ? 'low' : 'medium',  // Smart default
+    quality: isMobile ? 'medium' : 'medium', // Start at Medium to keep details
     sensitivity: 1.0,
     haptic: true,
-    antialiasing: !isMobile,               // AA is heavy on mobile
-    shadows: !isMobile,                    // Shadows are the main heat source
+    antialiasing: !isMobile,
+    shadows: true,                         // Enable shadows by default
     volMenu: 0.5,
     volGame: 0.4,
     volRain: 0.5,
     volThunder: 0.8,
-    grass: !isMobile,                      // Grass needs many draw calls
+    grass: true,                           // Enable grass by default
     rain: true
   };
 

@@ -88,14 +88,11 @@ const AtmosphereSystem = (() => {
     const sp = AtmosphereData.getCelestialPos(h, 6, _smoothPlayerPos);
     const mp = AtmosphereData.getCelestialPos(h, 18, _smoothPlayerPos);
 
-    // ─── Wall & Ceiling Line-Of-Sight Occlusion (Throttled 12Hz) ───
-    _raycastAccum += delta;
-    const mazeObj = _scene ? _scene.getObjectByName('Maze') : null;
+    // Performance Optimization: Throttle raycasting more on mobile instead of skipping it
     const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    const lowQuality = (window.Settings && Settings.get('quality') === 'low');
+    const customInterval = isMobile ? (1 / 6) : RAYCAST_INTERVAL; // 6Hz on mobile vs 12Hz desktop
 
-    // Performance Optimization: Skip expensive raycasting on low-end mobile devices
-    if (mazeObj && _raycastAccum >= RAYCAST_INTERVAL && !(isMobile && lowQuality)) {
+    if (mazeObj && _raycastAccum >= customInterval) {
       _raycastAccum = 0;
       const activeCam = (typeof CameraController !== 'undefined' && CameraController.getActive) ? CameraController.getActive() : null;
       const eyePos = activeCam ? activeCam.position.clone() : new THREE.Vector3(target.x, target.y + 1.6, target.z);

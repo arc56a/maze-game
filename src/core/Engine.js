@@ -23,14 +23,13 @@ const Engine = (() => {
       precision: 'mediump' // Standard for mobile to save GPU power
     });
 
-    // Smart DPR Capping: 2.5 is overkill for mobile and causes overheating.
-    // We cap at 1.5 for high-end, and 1.0/1.2 for standard.
+    // Smart DPR Capping: 1.5 is a sweet spot for mobile clarity vs heat.
     const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    const dpr = isMobile ? Math.min(window.devicePixelRatio, 1.2) : Math.min(window.devicePixelRatio || 1, 2.0);
+    const dpr = isMobile ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio || 1, 2.0);
 
     renderer.setPixelRatio(dpr);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = !isMobile; // Disable shadows by default on mobile startup
+    renderer.shadowMap.enabled = true; // Re-enable shadows for "details"
     renderer.shadowMap.type = isMobile ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
     renderer.shadowMap.autoUpdate = true;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
