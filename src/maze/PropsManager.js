@@ -78,8 +78,6 @@ const PropsManager = (() => {
 
     door.traverse(node => {
       if (node.isMesh) {
-        node.castShadow = true;
-        node.receiveShadow = true;
       }
     });
 
@@ -105,14 +103,12 @@ const PropsManager = (() => {
     const bracketGeo = new THREE.BoxGeometry(0.1, 0.4, 0.2);
     const bracketMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9, metalness: 0.5 });
     const bracket = new THREE.Mesh(bracketGeo, bracketMat);
-    bracket.castShadow = true;
     torchGroup.add(bracket);
 
     const handleGeo = new THREE.CylinderGeometry(0.04, 0.02, 0.6);
     const handle = new THREE.Mesh(handleGeo, bracketMat);
     handle.rotation.x = -Math.PI / 4;
     handle.position.set(0, 0.1, 0.15);
-    handle.castShadow = true;
     torchGroup.add(handle);
 
     // 2. Dynamic Light (Using LightSystem)
@@ -206,7 +202,7 @@ const PropsManager = (() => {
     door.position.set(x, y || 0, z);
     door.rotation.y = rot || 0;
 
-    door.traverse(node => { if (node.isMesh) { node.castShadow = node.receiveShadow = true; } });
+    door.traverse(node => { if (node.isMesh) { } });
     group.add(door);
 
     _addDoorLight(group, x + Math.sin(rot) * 0.8, z + Math.cos(rot) * 0.8);

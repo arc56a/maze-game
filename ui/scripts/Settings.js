@@ -18,7 +18,7 @@ const Settings = (() => {
     sensitivity: 1.0,
     haptic: true,
     antialiasing: !isMobile,
-    shadows: true,                         // Enable shadows by default
+    shadows: false,                        // Totally disabled
     volMenu: 0.5,
     volGame: 0.4,
     volRain: 0.5,

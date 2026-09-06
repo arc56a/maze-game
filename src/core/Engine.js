@@ -29,8 +29,8 @@ const Engine = (() => {
 
     renderer.setPixelRatio(dpr);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true; // Re-enable shadows for "details"
-    renderer.shadowMap.type = isMobile ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = false; // Shadows disabled for performance and visual clarity
+    renderer.shadowMap.type = THREE.BasicShadowMap;
     renderer.shadowMap.autoUpdate = true;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -86,12 +86,6 @@ const Engine = (() => {
     // Run all registered update callbacks
     for (const cb of updateCallbacks) cb(delta, elapsed);
 
-    // Dynamic Shadow Management (Robust Global Toggle)
-    const shadowsEnabled = (window.Settings && typeof Settings.get === 'function') ? (Settings.get('shadows') !== false) : true;
-    if (renderer.shadowMap.enabled !== shadowsEnabled) {
-      setShadows(shadowsEnabled);
-    }
-
     // Render
     const cam = CameraController.getActive();
     if (cam) {
@@ -133,37 +127,20 @@ const Engine = (() => {
 
   function setShadows(enabled) {
     if (!renderer || !scene) return;
-
-    // 1. Global Renderer Toggle
-    renderer.shadowMap.enabled = !!enabled;
-
-    // 2. Scene Traversal — update meshes accurately
-    const skyMeshNames = ['SkyDome', 'ProceduralSky', 'StarField', 'SunSprite', 'SunAuraSprite', 'MoonSprite', 'MoonAuraSprite', 'InstancedGrass'];
-
+    renderer.shadowMap.enabled = false;
     scene.traverse(node => {
-      // Mesh Shadow Handling
-      if (node.isMesh && !skyMeshNames.includes(node.name)) {
-        if (node.name === 'VastTerrain') {
-          node.castShadow    = false;
-          node.receiveShadow = !!enabled;
-        } else {
-          node.castShadow    = !!enabled;
-          node.receiveShadow = !!enabled;
-        }
-        // Force material re-compile to apply/strip shadow shaders
+      if (node.isMesh) {
+        node.castShadow = false;
+        node.receiveShadow = false;
         if (node.material) {
           const mats = Array.isArray(node.material) ? node.material : [node.material];
           mats.forEach(m => { if (m) m.needsUpdate = true; });
         }
       }
-
-      // Light Shadow Handling (Disable casting from all lights)
       if (node.isLight) {
-        node.castShadow = !!enabled;
+        node.castShadow = false;
       }
     });
-
-    console.log(`[Engine] Shadow system ${enabled ? 'ENABLED' : 'DISABLED'} across scene.`);
   }
 
   // ─── GPU Warm up ──────────────────────────────────────────

@@ -209,7 +209,6 @@ const MazeRenderer = (() => {
       floorGeo.rotateX(-Math.PI / 2);
       floorGeo.translate((cols * C) / 2, -0.05, (rows * C) / 2);
       const floorMesh = new THREE.Mesh(floorGeo, mat.floor);
-      floorMesh.receiveShadow = true;
       mazeGroup.add(floorMesh);
 
       // 2. Scatter Grass (3D Model / High Performance Tufts)
@@ -227,8 +226,6 @@ const MazeRenderer = (() => {
       instancedGrass.name = 'InstancedGrass';
       instancedGrass.visible = (window.Settings ? Settings.get('grass') !== false : true);
 
-      instancedGrass.castShadow = false;
-      instancedGrass.receiveShadow = false;
       instancedGrass.matrixAutoUpdate = false;
 
       const dummy = new THREE.Object3D();
@@ -446,12 +443,9 @@ const MazeRenderer = (() => {
 
             container.traverse(c => {
               if (c.isMesh && c.material) {
-                c.castShadow = true;
-                c.receiveShadow = true;
                 const ensureDouble = (m) => {
                   if (m) {
                     m.side = THREE.DoubleSide;
-                    m.shadowSide = THREE.DoubleSide;
                   }
                 };
                 if (Array.isArray(c.material)) c.material.forEach(ensureDouble);
@@ -646,7 +640,6 @@ const MazeRenderer = (() => {
         mesh.position.set(x, y + height / 2, z);
         mesh.rotation.set(rx, ry, rz, 'YXZ');
         mesh.scale.setScalar(w.scale ?? w.s ?? 1.0);
-        mesh.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
         mazeGroup.add(mesh);
       }
 
@@ -700,8 +693,6 @@ const MazeRenderer = (() => {
 
             container.traverse(c => {
               if (c.isMesh) {
-                c.castShadow = true;
-                c.receiveShadow = true;
                 if (c.material) {
                   const mats = Array.isArray(c.material) ? c.material : [c.material];
                   mats.forEach(m => { if (m) m.side = THREE.DoubleSide; });
@@ -743,8 +734,6 @@ const MazeRenderer = (() => {
         mesh.position.set(x, y - thickness / 2, z);
         mesh.rotation.set(rx, ry, rz, 'YXZ');
         mesh.scale.setScalar(f.scale ?? f.s ?? 1.0);
-        mesh.castShadow = true; // Essential for ceilings to block sun/moon
-        mesh.receiveShadow = true;
         mazeGroup.add(mesh);
       }
 
@@ -783,8 +772,6 @@ const MazeRenderer = (() => {
 
         model.traverse(c => {
           if (c.isMesh && c.material) {
-            c.castShadow = true;
-            c.receiveShadow = true;
             const ensureDouble = (m) => { if (m) m.side = THREE.DoubleSide; };
             if (Array.isArray(c.material)) c.material.forEach(ensureDouble);
             else ensureDouble(c.material);
@@ -846,8 +833,6 @@ const MazeRenderer = (() => {
           pillarMesh.scale.setScalar(scale);
           pillarMesh.traverse(c => {
             if (c.isMesh) {
-              c.castShadow = true;
-              c.receiveShadow = true;
               if (c.material) {
                 const mats = Array.isArray(c.material) ? c.material : [c.material];
                 mats.forEach(mat => { if (mat) mat.side = THREE.DoubleSide; });
@@ -865,14 +850,10 @@ const MazeRenderer = (() => {
 
     if (!isStatic && wallGeos.length) {
       const wallMesh = new THREE.Mesh(merge(wallGeos), mat.wall);
-      wallMesh.castShadow = true;
-      wallMesh.receiveShadow = true;
       mazeGroup.add(wallMesh);
     }
     if (!isStatic && pillarGeos.length) {
       const pillarMesh = new THREE.Mesh(merge(pillarGeos), mat.pillar);
-      pillarMesh.castShadow = true;
-      pillarMesh.receiveShadow = true;
       mazeGroup.add(pillarMesh);
     }
 
@@ -895,9 +876,6 @@ const MazeRenderer = (() => {
           instances: def.parts.map(p => {
             const im = new THREE.InstancedMesh(p.geometry, p.material, wallCount);
 
-            // Professional Shadows: Wall plants (vines/twine) now cast shadows for realism
-            im.castShadow = shadowEnabled;
-            im.receiveShadow = shadowEnabled;
             im.matrixAutoUpdate = false;
 
             mazeGroup.add(im);
@@ -1072,7 +1050,6 @@ const MazeRenderer = (() => {
         mats.forEach(m => {
           if (m) {
             m.side = THREE.DoubleSide;
-            m.shadowSide = THREE.DoubleSide;
             m.needsUpdate = true;
           }
         });

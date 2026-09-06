@@ -39,8 +39,6 @@ const PlayerController = (() => {
     model = entry.model;
     model.traverse(child => {
       if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
         child.layers.enable(0);
         child.layers.enable(1);
       }
@@ -166,9 +164,6 @@ const PlayerController = (() => {
 
       const targetFacing = Math.atan2(_dir.x, _dir.z);
       modelYaw = _smoothAngle(modelYaw, targetFacing, TURN_SPEED * delta);
-
-      // Trigger shadow map update on movement
-      if (typeof Engine !== 'undefined') Engine.shadowMapNeedsUpdate = true;
     }
 
     // ── Handle Jumping ──

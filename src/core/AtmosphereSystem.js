@@ -34,7 +34,7 @@ const AtmosphereSystem = (() => {
     const shadowsEnabled = (window.Settings && typeof Settings.get === 'function') ? (Settings.get('shadows') !== false) : true;
 
     sunLight = new THREE.DirectionalLight(0xfffbeb, 0); sunLight.name = 'SunLight';
-    sunLight.castShadow = shadowsEnabled;
+    sunLight.castShadow = false;
     const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     const shadowRes = isMobile ? 512 : 2048;
     sunLight.shadow.mapSize.set(shadowRes, shadowRes);
@@ -54,7 +54,7 @@ const AtmosphereSystem = (() => {
     _scene.add(sunLight); _scene.add(sunLight.target);
 
     moonLight = new THREE.DirectionalLight(0xa5c4f2, 0.0); moonLight.name = 'MoonLight';
-    moonLight.castShadow = shadowsEnabled;
+    moonLight.castShadow = false;
     moonLight.shadow.mapSize.set(shadowRes, shadowRes);
     moonLight.shadow.camera.near = 0.5; 
     moonLight.shadow.camera.far = 140;
@@ -172,7 +172,7 @@ const AtmosphereSystem = (() => {
       sunLight.intensity = sunBaseIntensity * (0.0 + 1.0 * indoorMult); // 0 indoors, full outdoors
 
       // Force sync shadow casting with global settings every frame
-      sunLight.castShadow = shadowsEnabled;
+      sunLight.castShadow = false;
 
       const sunDir = new THREE.Vector3(
         sp.x - _smoothPlayerPos.x,
@@ -190,7 +190,7 @@ const AtmosphereSystem = (() => {
       moonLight.intensity = moonBaseIntensity * (0.0 + 1.0 * indoorMult); // 0 indoors, full outdoors
 
       // Force sync shadow casting with global settings every frame
-      moonLight.castShadow = shadowsEnabled;
+      moonLight.castShadow = false;
 
       const moonDir = new THREE.Vector3(
         mp.x - _smoothPlayerPos.x,

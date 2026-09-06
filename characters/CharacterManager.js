@@ -85,7 +85,6 @@ const CharacterManager = (() => {
       // 4. Material Enhancement
       model.traverse(node => {
         if (node.isMesh) {
-          node.castShadow = node.receiveShadow = true;
           if (node.material) {
             const old = node.material;
             let tex = old.map;

@@ -74,8 +74,6 @@ const SceneManager = (() => {
 
     terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
     terrainMesh.position.set(50, -0.05, 50);
-    terrainMesh.receiveShadow = true;
-    terrainMesh.castShadow = false;
     terrainMesh.name = 'VastTerrain';
     scene.add(terrainMesh);
   }
@@ -185,8 +183,6 @@ const SceneManager = (() => {
       const rockGeo = new THREE.DodecahedronGeometry(1, 0);
       const rockMat = new THREE.MeshStandardMaterial({ roughness: 0.9 });
       const iRock = new THREE.InstancedMesh(rockGeo, rockMat, rockPositions.length);
-      iRock.castShadow = true;
-      iRock.receiveShadow = true;
 
       const dummy = new THREE.Object3D();
       rockPositions.forEach((p, i) => {
@@ -234,8 +230,6 @@ const SceneManager = (() => {
       });
 
       [iTrunk, ...iLeaves].forEach(m => {
-        m.castShadow = true;
-        m.receiveShadow = true;
         natureGroup.add(m);
       });
     }
@@ -269,8 +263,6 @@ const SceneManager = (() => {
       });
 
       [iTrunk, ...iLeaves].forEach(m => {
-        m.castShadow = true;
-        m.receiveShadow = true;
         natureGroup.add(m);
       });
     }
@@ -288,7 +280,6 @@ const SceneManager = (() => {
     const trunkGeo = new THREE.CylinderGeometry(0.25 * scale, 0.35 * scale, 2 * scale, 6);
     const trunk = new THREE.Mesh(trunkGeo, trunkMat);
     trunk.position.y = 1 * scale;
-    trunk.castShadow = true;
     tree.add(trunk);
 
     // Leaves layers
@@ -297,7 +288,6 @@ const SceneManager = (() => {
       const coneGeo = new THREE.ConeGeometry((1.8 - j * 0.4) * scale, 2 * scale, 6);
       const cone = new THREE.Mesh(coneGeo, leafMat);
       cone.position.y = (2.2 + j * 1.2) * scale;
-      cone.castShadow = true;
       tree.add(cone);
     }
 
@@ -315,7 +305,6 @@ const SceneManager = (() => {
     const trunk = new THREE.Mesh(trunkGeo, trunkMat);
     trunk.position.y = 2 * scale;
     trunk.rotation.z = (Math.random() - 0.5) * 0.2;
-    trunk.castShadow = true;
     tree.add(trunk);
 
     // Palm Top
@@ -340,7 +329,6 @@ const SceneManager = (() => {
     rock.position.set(x, Math.random() * 0.4 + 0.3, z);
     rock.rotation.set(Math.random(), Math.random(), Math.random());
     rock.scale.set(Math.random() * 0.5 + 1, Math.random() * 0.5 + 0.8, Math.random() * 0.5 + 1);
-    rock.castShadow = true;
     group.add(rock);
   }
 
