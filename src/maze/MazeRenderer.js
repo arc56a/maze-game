@@ -1065,14 +1065,18 @@ const MazeRenderer = (() => {
     // _addMazeLights is disabled for pure atmospheric dark night & moonlight
     [...wallGeos, ...pillarGeos].forEach(g => g.dispose());
 
-    // FINAL GLOBAL FORCE: Ensure EVERY mesh in the maze is DoubleSide for consistent visibility
+    // FINAL GLOBAL FORCE: Optimize visibility for performance
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     mazeGroup.traverse(node => {
       if (node.isMesh && node.material) {
         const mats = Array.isArray(node.material) ? node.material : [node.material];
         mats.forEach(m => {
           if (m) {
-            m.side = THREE.DoubleSide;
-            m.shadowSide = THREE.DoubleSide;
+            // Mobile Optimization: FrontSide is much faster than DoubleSide
+            // We only keep DoubleSide for things that really need it (like plants/grass)
+            const needsDouble = node.name.includes('Grass') || node.name.includes('Plant') || node.name.includes('Vines');
+            m.side = (isMobile && !needsDouble) ? THREE.FrontSide : THREE.DoubleSide;
+            m.shadowSide = THREE.FrontSide;
             m.needsUpdate = true;
           }
         });

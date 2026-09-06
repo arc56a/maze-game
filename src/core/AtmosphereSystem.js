@@ -35,7 +35,9 @@ const AtmosphereSystem = (() => {
 
     sunLight = new THREE.DirectionalLight(0xfffbeb, 0); sunLight.name = 'SunLight';
     sunLight.castShadow = shadowsEnabled;
-    sunLight.shadow.mapSize.set(2048, 2048);
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    const shadowRes = isMobile ? 512 : 2048;
+    sunLight.shadow.mapSize.set(shadowRes, shadowRes);
     sunLight.shadow.camera.near = 0.5; 
     sunLight.shadow.camera.far = 140;
     const shadowFrustumSize = 40;
@@ -53,7 +55,7 @@ const AtmosphereSystem = (() => {
 
     moonLight = new THREE.DirectionalLight(0xa5c4f2, 0.0); moonLight.name = 'MoonLight';
     moonLight.castShadow = shadowsEnabled;
-    moonLight.shadow.mapSize.set(2048, 2048);
+    moonLight.shadow.mapSize.set(shadowRes, shadowRes);
     moonLight.shadow.camera.near = 0.5; 
     moonLight.shadow.camera.far = 140;
     const moonShadowSize = 40;
@@ -89,8 +91,11 @@ const AtmosphereSystem = (() => {
     // ─── Wall & Ceiling Line-Of-Sight Occlusion (Throttled 12Hz) ───
     _raycastAccum += delta;
     const mazeObj = _scene ? _scene.getObjectByName('Maze') : null;
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    const lowQuality = (window.Settings && Settings.get('quality') === 'low');
 
-    if (mazeObj && _raycastAccum >= RAYCAST_INTERVAL) {
+    // Performance Optimization: Skip expensive raycasting on low-end mobile devices
+    if (mazeObj && _raycastAccum >= RAYCAST_INTERVAL && !(isMobile && lowQuality)) {
       _raycastAccum = 0;
       const activeCam = (typeof CameraController !== 'undefined' && CameraController.getActive) ? CameraController.getActive() : null;
       const eyePos = activeCam ? activeCam.position.clone() : new THREE.Vector3(target.x, target.y + 1.6, target.z);
